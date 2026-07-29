@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unregelmäßige Verben 1–270 · Тренажёр и словарь</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+    --txt:#e8eaed; --muted:#9aa2b1; --accent:#ffc400; --accent2:#4f8cff;
+    --ok:#2fbf71; --okbg:#12331f; --err:#ff5a5a; --errbg:#3a1414;
+    --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: light){
+    :root{--bg:#f4f6fa; --panel:#ffffff; --panel2:#f0f2f7; --line:#e2e6ee;
+      --txt:#1a1d24; --muted:#5b6472; --accent:#e0a500; --accent2:#2f6bff;
+      --ok:#1f9d57; --okbg:#e4f6ec; --err:#d63333; --errbg:#fceaea; --shadow:0 10px 30px rgba(20,30,60,.10);}
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.5; padding:20px; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px; margin:0 auto;}
+  header.top{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .flag{width:34px;height:24px;border-radius:4px;overflow:hidden;flex:0 0 auto;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .flag i{flex:1}.flag .b{background:#000}.flag .r{background:#dd0000}.flag .y{background:#ffce00}
+  h1{font-size:19px; margin:0; font-weight:700; letter-spacing:.2px}
+  h1 small{display:block; font-weight:500; color:var(--muted); font-size:12.5px; margin-top:2px}
+  .nav{display:flex; gap:8px; margin-bottom:16px}
+  .nav button{flex:1; font:inherit; font-weight:700; cursor:pointer; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--txt); transition:.15s}
+  .nav button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; margin-bottom:16px;}
+  .muted{color:var(--muted)}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  button{font:inherit; cursor:pointer; border:1px solid var(--line); background:var(--panel2); color:var(--txt); padding:11px 16px; border-radius:12px; transition:.15s; font-weight:600;}
+  button:hover{border-color:var(--accent2); transform:translateY(-1px)}
+  button.primary{background:var(--accent); color:#1a1400; border-color:transparent}
+  button.primary:hover{filter:brightness(1.05)}
+  button.ghost{background:transparent}
+  button:disabled{opacity:.45; cursor:not-allowed; transform:none; border-color:var(--line)}
+  .cardtitle{font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:8px}
+  .cardtitle .sub{font-weight:500; color:var(--muted); font-size:13px}
+  .rangebar{display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:12px}
+  .rangebar label{display:flex; align-items:center; gap:8px; font-weight:600}
+  .rangebar input[type=number]{width:92px; font:inherit; font-size:17px; font-weight:700; text-align:center; padding:10px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--txt)}
+  .rangebar input:focus{outline:none; border-color:var(--accent2)}
+  .presets{display:flex; gap:7px; flex-wrap:wrap}
+  .presets button{padding:6px 11px; font-size:12.5px; font-weight:600}
+  .presets button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+  .rwarn{margin-top:10px; color:var(--err); font-weight:600; font-size:13.5px}
+  .folders{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:2px 0 4px}
+  .folder{background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px; text-align:center}
+  .folder .n{font-size:26px; font-weight:800; line-height:1}
+  .folder .l{font-size:12.5px; color:var(--muted); margin-top:6px}
+  .folder.learned .n{color:var(--ok)} .folder.notlearned .n{color:var(--err)} .folder.new .n{color:var(--accent2)}
+  label.opt{display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; cursor:pointer; background:var(--panel2)}
+  label.opt input{accent-color:var(--accent2)}
+  .modes{display:flex; flex-direction:column; gap:8px; margin:6px 0 12px}
+  .mode-row{display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid var(--line); border-radius:12px; cursor:pointer; background:var(--panel2)}
+  .mode-row:hover{border-color:var(--accent2)}
+  .mode-row.sel{border-color:var(--accent); background:linear-gradient(0deg,rgba(255,196,0,.06),rgba(255,196,0,.06))}
+  .mode-row .t{font-weight:700} .mode-row .d{font-size:12.5px; color:var(--muted)}
+  .mode-row .cnt{margin-left:auto; font-weight:800; color:var(--muted)}
+  .pbar{height:8px; background:var(--panel2); border-radius:8px; overflow:hidden; margin-bottom:8px}
+  .pbar i{display:block; height:100%; background:var(--accent); width:0; transition:.3s}
+  .qmeta{display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:14px}
+  .verb{font-size:30px; font-weight:800; letter-spacing:.3px}
+  .verb .hint{font-size:15px; color:var(--muted); font-weight:600; margin-left:8px}
+  .field{margin-top:16px}
+  .field label{display:block; font-size:12.5px; color:var(--muted); margin-bottom:6px; font-weight:600; text-transform:uppercase; letter-spacing:.5px}
+  .field input{width:100%; font:inherit; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--txt); font-size:16px}
+  .field input:focus{outline:none; border-color:var(--accent2)}
+  .field input.good{border-color:var(--ok); background:var(--okbg)}
+  .field input.bad{border-color:var(--err); background:var(--errbg)}
+  .correct{margin-top:6px; font-size:13.5px}
+  .correct .ok{color:var(--ok); font-weight:700} .correct .bad{color:var(--err); font-weight:700}
+  .sol{font-weight:700}
+  .override{display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap}
+  .override .q{font-size:13px; color:var(--muted)}
+  .chip{padding:5px 11px; border-radius:20px; font-size:12.5px; border:1px solid var(--line); background:var(--panel2); cursor:pointer}
+  .chip.on-ok{background:var(--okbg); border-color:var(--ok); color:var(--ok)}
+  .chip.on-bad{background:var(--errbg); border-color:var(--err); color:var(--err)}
+  table{width:100%; border-collapse:collapse; font-size:14px; margin-top:6px}
+  th,td{text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.4px}
+  td.you{color:var(--err)}
+  .badge{display:inline-block; font-size:11px; padding:2px 7px; border-radius:6px; font-weight:700}
+  .badge.s{background:rgba(47,191,113,.15); color:var(--ok)}
+  .scorebig{font-size:44px; font-weight:900; text-align:center; margin:4px 0}
+  .scoresub{text-align:center; color:var(--muted); margin-bottom:6px}
+  .hide{display:none !important}
+  .foot{font-size:12px; color:var(--muted); text-align:center; margin-top:8px}
+  .divider{height:1px; background:var(--line); margin:16px 0}
+  input[type=file]{display:none}
+  kbd{background:var(--panel2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; font-size:12px}
+  /* dictionary */
+  .dsearch{width:100%; font:inherit; padding:11px 13px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--txt); margin-bottom:10px}
+  .filterchips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px}
+  .filterchips button{padding:6px 11px; font-size:12.5px; font-weight:600}
+  .filterchips button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+  .dtoggles{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:4px}
+  .dcount{font-size:12.5px; color:var(--muted); margin:4px 0 2px}
+  .dtable{border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .drow{display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:10px; padding:11px 12px; border-bottom:1px solid var(--line); align-items:start}
+  .drow:last-child{border-bottom:none}
+  .drow:nth-child(even){background:var(--panel2)}
+  .dinf{font-weight:800}
+  .dinf .num{color:var(--muted); font-weight:700; margin-right:4px; font-size:13px}
+  .dinf .hint{color:var(--muted); font-weight:600; font-size:12.5px}
+  .dforms{font-size:11.5px; color:var(--muted); margin-top:2px}
+  .dperf{font-weight:700}
+  .dperf.ist{color:var(--accent2)} .dperf.hat{color:var(--txt)}
+  .dtrans{}
+  .dhead{display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:10px; padding:9px 12px; background:var(--panel2); border-bottom:1px solid var(--line); font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); font-weight:700; position:sticky; top:0}
+  .dscroll{max-height:66vh; overflow:auto; border:1px solid var(--line); border-radius:12px}
+  .dactions{display:flex; gap:4px}
+  .dactions button{padding:3px 7px; font-size:12px; border-radius:8px}
+  .dactions button.act{border-color:var(--accent2)}
+  .masked{filter:blur(6px); cursor:pointer; user-select:none; transition:filter .1s}
+  .masked:hover{filter:blur(3px)}
+  .masked.revealed{filter:none; user-select:auto; cursor:default}
+  .sdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:2px;vertical-align:middle}
+  .sdot.learned{background:var(--ok)} .sdot.notlearned{background:var(--err)} .sdot.new{background:var(--accent2)}
+  @media (max-width:560px){ .drow,.dhead{grid-template-columns:1fr 1fr; }
+    .dhead span:nth-child(3),.dhead span:nth-child(4){display:none}
+    .drow .dtrans{grid-column:1/2} .drow .dactions{grid-column:2/3; justify-self:end} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="flag"><i class="b"></i><i class="r"></i><i class="y"></i></div>
+    <div><h1>Unregelmäßige Verben · 1–270
+      <small>Тренажёр (перевод + Perfekt) и словарь для повторения</small></h1></div>
+  </header>
+
+  <div class="nav" id="nav">
+    <button data-tab="home" class="sel">🎯 Тренажёр</button>
+    <button data-tab="dict">📖 Словарь</button>
+  </div>
+
+  <!-- HOME -->
+  <div id="startScreen">
+    <div class="card">
+      <div class="cardtitle">📍 Диапазон глаголов <span class="sub" id="rangeCount"></span></div>
+      <div class="rangebar">
+        <label>от <input type="number" id="rFrom" min="1" max="270" value="1"></label>
+        <label>до <input type="number" id="rTo" min="1" max="270" value="35"></label>
+      </div>
+      <div class="presets" id="presets"></div>
+      <div class="rwarn hide" id="rWarn"></div>
+    </div>
+    <div class="card">
+      <div class="folders">
+        <div class="folder learned"><div class="n" id="cLearned">0</div><div class="l">📗 Выучено</div></div>
+        <div class="folder notlearned"><div class="n" id="cNot">0</div><div class="l">📕 Невыучено</div></div>
+        <div class="folder new"><div class="n" id="cNew">0</div><div class="l">📘 Новые</div></div>
+      </div>
+      <div class="foot" id="foldersSub"></div>
+      <div class="foot" id="savedInfo"></div>
+    </div>
+    <div class="card">
+      <div class="cardtitle">🎯 Что тренируем <span class="sub">в выбранном диапазоне</span></div>
+      <div class="modes" id="modeList"></div>
+      <div class="row">
+        <label class="opt"><input type="checkbox" id="chkShuffle" checked> Перемешать</label>
+        <label class="opt"><input type="checkbox" id="chkTrans" checked> Спрашивать перевод</label>
+        <label class="opt"><input type="checkbox" id="chkPerf" checked> Спрашивать Perfekt</label>
+      </div>
+      <div class="divider"></div>
+      <div class="row">
+        <button class="primary" id="startBtn">▶ Начать тест</button>
+        <button class="ghost" id="dictShortcut">📖 Открыть словарь</button>
+        <button class="ghost" id="exportBtn">⬇ Экспорт</button>
+        <button class="ghost" id="importBtn">⬆ Импорт</button>
+        <button class="ghost" id="resetBtn">↺ Сброс</button>
+        <input type="file" id="fileInput" accept="application/json,.json">
+      </div>
+      <div class="foot">Прогресс автосохраняется в этом браузере. «Экспорт» скачивает файл прогресса с датой и временем в названии.</div>
+    </div>
+  </div>
+
+  <!-- DICTIONARY -->
+  <div id="dictScreen" class="hide">
+    <div class="card">
+      <div class="cardtitle">📖 Словарь глаголов <span class="sub" id="dictSub"></span></div>
+      <input class="dsearch" id="dictSearch" placeholder="Поиск: инфинитив, перевод или номер…">
+      <div class="filterchips" id="dictFilters">
+        <button data-f="all" class="sel">Все 270</button>
+        <button data-f="range">В диапазоне</button>
+        <button data-f="learned">📗 Выучено</button>
+        <button data-f="notlearned">📕 Невыучено</button>
+        <button data-f="new">📘 Новые</button>
+      </div>
+      <div class="dtoggles">
+        <label class="opt"><input type="checkbox" id="hideTrans"> Скрыть перевод</label>
+        <label class="opt"><input type="checkbox" id="hidePerf"> Скрыть Perfekt</label>
+      </div>
+      <div class="foot" style="text-align:left;margin:6px 0 0">Режим самопроверки: включи «скрыть» и нажимай на ячейку, чтобы открыть ответ.</div>
+      <div class="dcount" id="dictCount"></div>
+      <div class="dscroll">
+        <div class="dhead"><span>Глагол · Präs · Prät</span><span>Perfekt</span><span>Перевод</span><span>Папка</span></div>
+        <div id="dictBody"></div>
+      </div>
+      <div class="foot" id="dictEmpty"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quizScreen" class="hide">
+    <div class="card">
+      <div class="pbar"><i id="pfill"></i></div>
+      <div class="qmeta"><span id="qpos"></span><span id="qscore"></span></div>
+      <div class="verb" id="qverb"></div>
+      <div class="field" id="fTrans">
+        <label>Перевод (на русский)</label>
+        <input id="inTrans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="напр. прерывать">
+        <div class="correct hide" id="corrTrans"></div>
+        <div class="override hide" id="ovTrans">
+          <span class="q">Засчитать перевод?</span>
+          <button class="chip" data-val="1">✓ Верно</button>
+          <button class="chip" data-val="0">✗ Ошибка</button>
+        </div>
+      </div>
+      <div class="field" id="fPerf">
+        <label>Perfekt (со вспомог. глаголом)</label>
+        <input id="inPerf" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="напр. hat abgebrochen">
+        <div class="correct hide" id="corrPerf"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="row">
+        <button class="primary" id="checkBtn">Проверить</button>
+        <button class="primary hide" id="nextBtn">Дальше →</button>
+        <button class="ghost" id="quitBtn">Завершить</button>
+      </div>
+      <div class="foot"><kbd>Enter</kbd> — проверить / дальше</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultScreen" class="hide">
+    <div class="card">
+      <div class="scorebig" id="rScore"></div>
+      <div class="scoresub" id="rSub"></div>
+      <div class="folders" style="margin-top:14px">
+        <div class="folder learned"><div class="n" id="rLearned">0</div><div class="l">📗 Выучено</div></div>
+        <div class="folder notlearned"><div class="n" id="rNot">0</div><div class="l">📕 Невыучено</div></div>
+        <div class="folder new"><div class="n" id="rNew">0</div><div class="l">📘 Новые</div></div>
+      </div>
+      <div class="foot" id="rFoldersSub"></div>
+    </div>
+    <div class="card" id="errCard">
+      <div style="font-weight:800;margin-bottom:2px">Разбор ошибок</div>
+      <div class="muted" style="font-size:13px;margin-bottom:6px" id="errIntro"></div>
+      <div id="errBody"></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <button class="primary" id="retryWrong">↻ Повторить ошибки этого теста</button>
+        <button class="ghost" id="againBtn">🏠 На главную</button>
+        <button class="ghost" id="exportBtn2">⬇ Экспорт</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">Основано на таблице «Unregelmäßige Verben» · глаголы 1–270</div>
+</div>
+
+<script>
+"use strict";
+
+const VERBS = [{"id": 1, "inf": "abbrechen", "hint": "", "aux": "hat", "pras": "er bricht ab", "prat": "brach ab", "perf": ["hat abgebrochen"], "trans": "прерывать, обрывать", "tKeys": ["прерывать", "обрывать", "прерыва", "обрыва"]}, {"id": 2, "inf": "abfahren", "hint": "", "aux": "ist", "pras": "er fährt ab", "prat": "fuhr ab", "perf": ["ist abgefahren"], "trans": "отправляться, уезжать", "tKeys": ["отправляться", "отправлять", "уезжать", "уезжа"]}, {"id": 3, "inf": "abgeben", "hint": "", "aux": "hat", "pras": "er gibt ab", "prat": "gab ab", "perf": ["hat abgegeben"], "trans": "сдавать, отдавать", "tKeys": ["отдавать", "сдавать", "отдава", "сдава"]}, {"id": 4, "inf": "abhängen", "hint": "", "aux": "hat", "pras": "es hängt ab", "prat": "hing ab", "perf": ["hat abgehangen"], "trans": "зависеть", "tKeys": ["зависеть", "зависе"]}, {"id": 5, "inf": "abheben", "hint": "", "aux": "hat", "pras": "er hebt ab", "prat": "hob ab", "perf": ["hat abgehoben"], "trans": "снимать (деньги); выделяться", "tKeys": ["выделяться", "выделять", "снимать", "снима"]}, {"id": 6, "inf": "abnehmen", "hint": "", "aux": "hat", "pras": "er nimmt ab", "prat": "nahm ab", "perf": ["hat abgenommen"], "trans": "худеть; снимать", "tKeys": ["снимать", "худеть", "снима", "худе"]}, {"id": 7, "inf": "abschließen", "hint": "", "aux": "hat", "pras": "er schließt ab", "prat": "schloss ab", "perf": ["hat abgeschlossen"], "trans": "закрывать; заключать (договор)", "tKeys": ["заключать", "закрывать", "заключа", "закрыва"]}, {"id": 8, "inf": "anbieten", "hint": "", "aux": "hat", "pras": "er bietet an", "prat": "bot an", "perf": ["hat angeboten"], "trans": "предлагать", "tKeys": ["предлагать", "предлага"]}, {"id": 9, "inf": "anerkennen", "hint": "", "aux": "hat", "pras": "er erkennt an", "prat": "erkannte an", "perf": ["hat anerkannt"], "trans": "признавать", "tKeys": ["признавать", "признава"]}, {"id": 10, "inf": "anfangen", "hint": "", "aux": "hat", "pras": "er fängt an", "prat": "fing an", "perf": ["hat angefangen"], "trans": "начинать", "tKeys": ["начинать", "начина"]}, {"id": 11, "inf": "angeben", "hint": "", "aux": "hat", "pras": "er gibt an", "prat": "gab an", "perf": ["hat angegeben"], "trans": "указывать; хвастаться", "tKeys": ["хвастаться", "указывать", "хвастать", "указыва"]}, {"id": 12, "inf": "ankommen", "hint": "", "aux": "ist", "pras": "er kommt an", "prat": "kam an", "perf": ["ist angekommen"], "trans": "прибывать", "tKeys": ["прибывать", "прибыва"]}, {"id": 13, "inf": "annehmen", "hint": "", "aux": "hat", "pras": "er nimmt an", "prat": "nahm an", "perf": ["hat angenommen"], "trans": "принимать; предполагать", "tKeys": ["предполагать", "предполага", "принимать", "принима"]}, {"id": 14, "inf": "anrufen", "hint": "", "aux": "hat", "pras": "er ruft an", "prat": "rief an", "perf": ["hat angerufen"], "trans": "звонить", "tKeys": ["звонить", "звони"]}, {"id": 15, "inf": "ansehen", "hint": "", "aux": "hat", "pras": "er sieht an", "prat": "sah an", "perf": ["hat angesehen"], "trans": "смотреть на, рассматривать", "tKeys": ["рассматривать", "рассматрива", "смотреть", "смотре"]}, {"id": 16, "inf": "ansprechen", "hint": "", "aux": "hat", "pras": "er spricht an", "prat": "sprach an", "perf": ["hat angesprochen"], "trans": "обращаться к, заговаривать", "tKeys": ["заговаривать", "заговарива", "обращаться", "обращать"]}, {"id": 17, "inf": "anwenden", "hint": "", "aux": "hat", "pras": "er wendet an", "prat": "wendete/wandte an", "perf": ["hat angewendet", "hat angewandt"], "trans": "применять", "tKeys": ["применять", "применя"]}, {"id": 18, "inf": "auffallen", "hint": "", "aux": "ist", "pras": "er fällt auf", "prat": "fiel auf", "perf": ["ist aufgefallen"], "trans": "бросаться в глаза", "tKeys": ["бросаться", "бросать", "глаза", "глаз"]}, {"id": 19, "inf": "aufgeben", "hint": "", "aux": "hat", "pras": "er gibt auf", "prat": "gab auf", "perf": ["hat aufgegeben"], "trans": "сдаваться; отказываться", "tKeys": ["отказываться", "отказывать", "сдаваться", "сдавать"]}, {"id": 20, "inf": "aufheben", "hint": "", "aux": "hat", "pras": "er hebt auf", "prat": "hob auf", "perf": ["hat aufgehoben"], "trans": "поднимать; отменять", "tKeys": ["поднимать", "отменять", "поднима", "отменя"]}, {"id": 21, "inf": "aufladen", "hint": "", "aux": "hat", "pras": "er lädt auf", "prat": "lud auf", "perf": ["hat aufgeladen"], "trans": "загружать; заряжать", "tKeys": ["загружать", "заряжать", "загружа", "заряжа"]}, {"id": 22, "inf": "aufnehmen", "hint": "", "aux": "hat", "pras": "er nimmt auf", "prat": "nahm auf", "perf": ["hat aufgenommen"], "trans": "принимать; записывать", "tKeys": ["записывать", "принимать", "записыва", "принима"]}, {"id": 23, "inf": "aufstehen", "hint": "", "aux": "ist", "pras": "er steht auf", "prat": "stand auf", "perf": ["ist aufgestanden"], "trans": "вставать", "tKeys": ["вставать", "встава"]}, {"id": 24, "inf": "auftreten", "hint": "", "aux": "ist", "pras": "er tritt auf", "prat": "trat auf", "perf": ["ist aufgetreten"], "trans": "выступать; появляться", "tKeys": ["появляться", "выступать", "появлять", "выступа"]}, {"id": 25, "inf": "ausfallen", "hint": "", "aux": "ist", "pras": "er fällt aus", "prat": "fiel aus", "perf": ["ist ausgefallen"], "trans": "отменяться; выпадать", "tKeys": ["отменяться", "выпадать", "отменять", "выпада"]}, {"id": 26, "inf": "ausgehen", "hint": "", "aux": "ist", "pras": "er geht aus", "prat": "ging aus", "perf": ["ist ausgegangen"], "trans": "выходить (из дома); заканчиваться", "tKeys": ["заканчиваться", "заканчивать", "выходить", "выходи"]}, {"id": 27, "inf": "ausleihen", "hint": "", "aux": "hat", "pras": "er leiht aus", "prat": "lieh aus", "perf": ["hat ausgeliehen"], "trans": "одалживать (брать/давать)", "tKeys": ["одалживать", "одалжива"]}, {"id": 28, "inf": "ausschlafen", "hint": "", "aux": "hat", "pras": "er schläft aus", "prat": "schlief aus", "perf": ["hat ausgeschlafen"], "trans": "высыпаться", "tKeys": ["высыпаться", "высыпать"]}, {"id": 29, "inf": "aussehen", "hint": "", "aux": "hat", "pras": "er sieht aus", "prat": "sah aus", "perf": ["hat ausgesehen"], "trans": "выглядеть", "tKeys": ["выглядеть", "выгляде"]}, {"id": 30, "inf": "aussprechen", "hint": "", "aux": "hat", "pras": "er spricht aus", "prat": "sprach aus", "perf": ["hat ausgesprochen"], "trans": "произносить; высказывать", "tKeys": ["высказывать", "произносить", "высказыва", "произноси"]}, {"id": 31, "inf": "aussteigen", "hint": "", "aux": "ist", "pras": "er steigt aus", "prat": "stieg aus", "perf": ["ist ausgestiegen"], "trans": "выходить (из транспорта)", "tKeys": ["выходить", "выходи"]}, {"id": 32, "inf": "ausweichen", "hint": "", "aux": "ist", "pras": "er weicht aus", "prat": "wich aus", "perf": ["ist ausgewichen"], "trans": "уклоняться, избегать", "tKeys": ["уклоняться", "избегать", "уклонять", "избега"]}, {"id": 33, "inf": "ausziehen", "hint": "одежду", "aux": "hat", "pras": "er zieht aus", "prat": "zog aus", "perf": ["hat ausgezogen"], "trans": "снимать (одежду)", "tKeys": ["снимать", "снима"]}, {"id": 34, "inf": "ausziehen", "hint": "из квартиры", "aux": "ist", "pras": "er zieht aus", "prat": "zog aus", "perf": ["ist ausgezogen"], "trans": "съезжать (из квартиры)", "tKeys": ["съезжать", "съезжа"]}, {"id": 35, "inf": "backen", "hint": "", "aux": "hat", "pras": "er bäckt/backt", "prat": "buk/backte", "perf": ["hat gebacken"], "trans": "печь", "tKeys": ["печь"]}, {"id": 36, "inf": "befehlen", "hint": "", "aux": "hat", "pras": "er befiehlt", "prat": "befahl", "perf": ["hat befohlen"], "trans": "приказывать", "tKeys": ["приказывать", "приказыва"]}, {"id": 37, "inf": "sich befinden", "hint": "", "aux": "hat", "pras": "er befindet sich", "prat": "befand sich", "perf": ["hat sich befunden"], "trans": "находиться", "tKeys": ["находиться", "находить"]}, {"id": 38, "inf": "beginnen", "hint": "", "aux": "hat", "pras": "er beginnt", "prat": "begann", "perf": ["hat begonnen"], "trans": "начинать(ся)", "tKeys": ["начинать", "начина"]}, {"id": 39, "inf": "begreifen", "hint": "", "aux": "hat", "pras": "er begreift", "prat": "begriff", "perf": ["hat begriffen"], "trans": "понимать, постигать", "tKeys": ["постигать", "понимать", "постига", "понима"]}, {"id": 40, "inf": "behalten", "hint": "", "aux": "hat", "pras": "er behält", "prat": "behielt", "perf": ["hat behalten"], "trans": "оставлять себе; сохранять в памяти", "tKeys": ["оставлять", "сохранять", "оставля", "сохраня", "памяти", "памя"]}, {"id": 41, "inf": "beibringen", "hint": "", "aux": "hat", "pras": "er bringt bei", "prat": "brachte bei", "perf": ["hat beigebracht"], "trans": "обучать, научить", "tKeys": ["научить", "обучать", "научи", "обуча"]}, {"id": 42, "inf": "beißen", "hint": "", "aux": "hat", "pras": "er beißt", "prat": "biss", "perf": ["hat gebissen"], "trans": "кусать", "tKeys": ["кусать", "куса"]}, {"id": 43, "inf": "bekommen", "hint": "", "aux": "hat", "pras": "er bekommt", "prat": "bekam", "perf": ["hat bekommen"], "trans": "получать", "tKeys": ["получать", "получа"]}, {"id": 44, "inf": "beraten", "hint": "", "aux": "hat", "pras": "er berät", "prat": "beriet", "perf": ["hat beraten"], "trans": "советовать, консультировать", "tKeys": ["консультировать", "консультирова", "советовать", "советова"]}, {"id": 45, "inf": "beschließen", "hint": "", "aux": "hat", "pras": "er beschließt", "prat": "beschloss", "perf": ["hat beschlossen"], "trans": "решать, постановлять", "tKeys": ["постановлять", "постановля", "решать", "реша"]}, {"id": 46, "inf": "besprechen", "hint": "", "aux": "hat", "pras": "er bespricht", "prat": "besprach", "perf": ["hat besprochen"], "trans": "обсуждать", "tKeys": ["обсуждать", "обсужда"]}, {"id": 47, "inf": "bestehen", "hint": "", "aux": "hat", "pras": "er besteht", "prat": "bestand", "perf": ["hat bestanden"], "trans": "существовать; сдавать (экзамен)", "tKeys": ["существовать", "существова", "сдавать", "сдава"]}, {"id": 48, "inf": "betreffen", "hint": "", "aux": "hat", "pras": "es betrifft", "prat": "betraf", "perf": ["hat betroffen"], "trans": "касаться, затрагивать", "tKeys": ["затрагивать", "затрагива", "касаться", "касать"]}, {"id": 49, "inf": "betreiben", "hint": "", "aux": "hat", "pras": "er betreibt", "prat": "betrieb", "perf": ["hat betrieben"], "trans": "заниматься (чем-л.), эксплуатировать", "tKeys": ["эксплуатировать", "эксплуатирова", "заниматься", "занимать"]}, {"id": 50, "inf": "betrügen", "hint": "", "aux": "hat", "pras": "er betrügt", "prat": "betrog", "perf": ["hat betrogen"], "trans": "обманывать", "tKeys": ["обманывать", "обманыва"]}, {"id": 51, "inf": "sich beziehen", "hint": "", "aux": "hat", "pras": "er bezieht sich", "prat": "bezog sich", "perf": ["hat sich bezogen"], "trans": "относиться (к чему-л.), ссылаться", "tKeys": ["относиться", "ссылаться", "относить", "ссылать"]}, {"id": 52, "inf": "biegen", "hint": "", "aux": "hat", "pras": "er biegt", "prat": "bog", "perf": ["hat gebogen"], "trans": "гнуть, сгибать", "tKeys": ["сгибать", "гнуть", "сгиба", "гнут"]}, {"id": 53, "inf": "bieten", "hint": "", "aux": "hat", "pras": "er bietet", "prat": "bot", "perf": ["hat geboten"], "trans": "предлагать", "tKeys": ["предлагать", "предлага"]}, {"id": 54, "inf": "binden", "hint": "", "aux": "hat", "pras": "er bindet", "prat": "band", "perf": ["hat gebunden"], "trans": "связывать", "tKeys": ["связывать", "связыва"]}, {"id": 55, "inf": "bitten", "hint": "", "aux": "hat", "pras": "er bittet", "prat": "bat", "perf": ["hat gebeten"], "trans": "просить", "tKeys": ["просить", "проси"]}, {"id": 56, "inf": "bleiben", "hint": "", "aux": "ist", "pras": "er bleibt", "prat": "blieb", "perf": ["ist geblieben"], "trans": "оставаться", "tKeys": ["оставаться", "оставать"]}, {"id": 57, "inf": "braten", "hint": "", "aux": "hat", "pras": "er brät", "prat": "briet", "perf": ["hat gebraten"], "trans": "жарить", "tKeys": ["жарить", "жари"]}, {"id": 58, "inf": "brechen", "hint": "", "aux": "hat", "pras": "er bricht", "prat": "brach", "perf": ["hat gebrochen"], "trans": "ломать", "tKeys": ["ломать", "лома"]}, {"id": 59, "inf": "brennen", "hint": "", "aux": "hat", "pras": "er brennt", "prat": "brannte", "perf": ["hat gebrannt"], "trans": "гореть", "tKeys": ["гореть", "горе"]}, {"id": 60, "inf": "bringen", "hint": "", "aux": "hat", "pras": "er bringt", "prat": "brachte", "perf": ["hat gebracht"], "trans": "приносить", "tKeys": ["приносить", "приноси"]}, {"id": 61, "inf": "denken", "hint": "", "aux": "hat", "pras": "er denkt", "prat": "dachte", "perf": ["hat gedacht"], "trans": "думать", "tKeys": ["думать", "дума"]}, {"id": 62, "inf": "dürfen", "hint": "", "aux": "hat", "pras": "er darf", "prat": "durfte", "perf": ["hat dürfen", "hat gedurft"], "trans": "мочь (иметь разрешение)", "tKeys": ["мочь"]}, {"id": 63, "inf": "eindringen", "hint": "", "aux": "ist", "pras": "er dringt ein", "prat": "drang ein", "perf": ["ist eingedrungen"], "trans": "вторгаться, проникать", "tKeys": ["вторгаться", "проникать", "вторгать", "проника"]}, {"id": 64, "inf": "einfallen", "hint": "", "aux": "ist", "pras": "er fällt ein", "prat": "fiel ein", "perf": ["ist eingefallen"], "trans": "приходить в голову", "tKeys": ["приходить", "приходи", "голову", "голо"]}, {"id": 65, "inf": "eingeben", "hint": "", "aux": "hat", "pras": "er gibt ein", "prat": "gab ein", "perf": ["hat eingegeben"], "trans": "вводить (данные)", "tKeys": ["вводить", "вводи"]}, {"id": 66, "inf": "einhalten", "hint": "", "aux": "hat", "pras": "er hält ein", "prat": "hielt ein", "perf": ["hat eingehalten"], "trans": "соблюдать", "tKeys": ["соблюдать", "соблюда"]}, {"id": 67, "inf": "einladen", "hint": "", "aux": "hat", "pras": "er lädt ein", "prat": "lud ein", "perf": ["hat eingeladen"], "trans": "приглашать", "tKeys": ["приглашать", "приглаша"]}, {"id": 68, "inf": "einschlafen", "hint": "", "aux": "ist", "pras": "er schläft ein", "prat": "schlief ein", "perf": ["ist eingeschlafen"], "trans": "засыпать", "tKeys": ["засыпать", "засыпа"]}, {"id": 69, "inf": "einschließen", "hint": "", "aux": "hat", "pras": "er schließt ein", "prat": "schloss ein", "perf": ["hat eingeschlossen"], "trans": "запирать; включать", "tKeys": ["включать", "запирать", "включа", "запира"]}, {"id": 70, "inf": "einwerfen", "hint": "", "aux": "hat", "pras": "er wirft ein", "prat": "warf ein", "perf": ["hat eingeworfen"], "trans": "бросать (в щель); вставлять (замечание)", "tKeys": ["вставлять", "бросать", "вставля", "броса"]}, {"id": 71, "inf": "einziehen", "hint": "", "aux": "ist", "pras": "er zieht ein", "prat": "zog ein", "perf": ["ist eingezogen"], "trans": "въезжать (в квартиру)", "tKeys": ["въезжать", "въезжа"]}, {"id": 72, "inf": "empfangen", "hint": "", "aux": "hat", "pras": "er empfängt", "prat": "empfing", "perf": ["hat empfangen"], "trans": "принимать (гостей, сигнал)", "tKeys": ["принимать", "принима"]}, {"id": 73, "inf": "empfehlen", "hint": "", "aux": "hat", "pras": "er empfiehlt", "prat": "empfahl", "perf": ["hat empfohlen"], "trans": "рекомендовать", "tKeys": ["рекомендовать", "рекомендова"]}, {"id": 74, "inf": "empfinden", "hint": "", "aux": "hat", "pras": "er empfindet", "prat": "empfand", "perf": ["hat empfunden"], "trans": "чувствовать, ощущать", "tKeys": ["чувствовать", "чувствова", "ощущать", "ощуща"]}, {"id": 75, "inf": "enthalten", "hint": "", "aux": "hat", "pras": "es enthält", "prat": "enthielt", "perf": ["hat enthalten"], "trans": "содержать", "tKeys": ["содержать", "содержа"]}, {"id": 76, "inf": "entlassen", "hint": "", "aux": "hat", "pras": "er entlässt", "prat": "entließ", "perf": ["hat entlassen"], "trans": "увольнять", "tKeys": ["увольнять", "увольня"]}, {"id": 77, "inf": "entnehmen", "hint": "", "aux": "hat", "pras": "er entnimmt", "prat": "entnahm", "perf": ["hat entnommen"], "trans": "брать (из); заключать (из текста)", "tKeys": ["заключать", "заключа", "брать", "брат"]}, {"id": 78, "inf": "entscheiden", "hint": "", "aux": "hat", "pras": "er entscheidet", "prat": "entschied", "perf": ["hat entschieden"], "trans": "решать", "tKeys": ["решать", "реша"]}, {"id": 79, "inf": "sich entschließen", "hint": "", "aux": "hat", "pras": "er entschließt sich", "prat": "entschloss sich", "perf": ["hat sich entschlossen"], "trans": "решаться", "tKeys": ["решаться", "решать"]}, {"id": 80, "inf": "entsprechen", "hint": "", "aux": "hat", "pras": "er entspricht", "prat": "entsprach", "perf": ["hat entsprochen"], "trans": "соответствовать", "tKeys": ["соответствовать", "соответствова"]}, {"id": 81, "inf": "entstehen", "hint": "", "aux": "ist", "pras": "er entsteht", "prat": "entstand", "perf": ["ist entstanden"], "trans": "возникать", "tKeys": ["возникать", "возника"]}, {"id": 82, "inf": "entwerfen", "hint": "", "aux": "hat", "pras": "er entwirft", "prat": "entwarf", "perf": ["hat entworfen"], "trans": "разрабатывать, проектировать", "tKeys": ["проектировать", "разрабатывать", "проектирова", "разрабатыва"]}, {"id": 83, "inf": "erfahren", "hint": "", "aux": "hat", "pras": "er erfährt", "prat": "erfuhr", "perf": ["hat erfahren"], "trans": "узнавать", "tKeys": ["узнавать", "узнава"]}, {"id": 84, "inf": "erfinden", "hint": "", "aux": "hat", "pras": "er erfindet", "prat": "erfand", "perf": ["hat erfunden"], "trans": "изобретать", "tKeys": ["изобретать", "изобрета"]}, {"id": 85, "inf": "sich ergeben", "hint": "", "aux": "hat", "pras": "es ergibt sich", "prat": "ergab sich", "perf": ["hat sich ergeben"], "trans": "получаться; сдаваться", "tKeys": ["получаться", "сдаваться", "получать", "сдавать"]}, {"id": 86, "inf": "ergreifen", "hint": "", "aux": "hat", "pras": "er ergreift", "prat": "ergriff", "perf": ["hat ergriffen"], "trans": "хватать, охватывать", "tKeys": ["охватывать", "охватыва", "хватать", "хвата"]}, {"id": 87, "inf": "erhalten", "hint": "", "aux": "hat", "pras": "er erhält", "prat": "erhielt", "perf": ["hat erhalten"], "trans": "получать; сохранять", "tKeys": ["сохранять", "получать", "сохраня", "получа"]}, {"id": 88, "inf": "erkennen", "hint": "", "aux": "hat", "pras": "er erkennt", "prat": "erkannte", "perf": ["hat erkannt"], "trans": "узнавать, распознавать", "tKeys": ["распознавать", "распознава", "узнавать", "узнава"]}, {"id": 89, "inf": "erscheinen", "hint": "", "aux": "ist", "pras": "er erscheint", "prat": "erschien", "perf": ["ist erschienen"], "trans": "появляться", "tKeys": ["появляться", "появлять"]}, {"id": 90, "inf": "ertragen", "hint": "", "aux": "hat", "pras": "er erträgt", "prat": "ertrug", "perf": ["hat ertragen"], "trans": "терпеть, выносить", "tKeys": ["выносить", "терпеть", "выноси", "терпе"]}, {"id": 91, "inf": "sich erweisen", "hint": "", "aux": "hat", "pras": "es erweist sich", "prat": "erwies sich", "perf": ["hat sich erwiesen"], "trans": "оказываться", "tKeys": ["оказываться", "оказывать"]}, {"id": 92, "inf": "erwerben", "hint": "", "aux": "hat", "pras": "er erwirbt", "prat": "erwarb", "perf": ["hat erworben"], "trans": "приобретать", "tKeys": ["приобретать", "приобрета"]}, {"id": 93, "inf": "erziehen", "hint": "", "aux": "hat", "pras": "er erzieht", "prat": "erzog", "perf": ["hat erzogen"], "trans": "воспитывать", "tKeys": ["воспитывать", "воспитыва"]}, {"id": 94, "inf": "essen", "hint": "", "aux": "hat", "pras": "er isst", "prat": "aß", "perf": ["hat gegessen"], "trans": "есть, кушать", "tKeys": ["кушать", "есть", "куша"]}, {"id": 95, "inf": "fahren", "hint": "", "aux": "ist", "pras": "er fährt", "prat": "fuhr", "perf": ["ist gefahren"], "trans": "ехать", "tKeys": ["ехать", "ехат"]}, {"id": 96, "inf": "fallen", "hint": "", "aux": "ist", "pras": "er fällt", "prat": "fiel", "perf": ["ist gefallen"], "trans": "падать", "tKeys": ["падать", "пада"]}, {"id": 97, "inf": "fangen", "hint": "", "aux": "hat", "pras": "er fängt", "prat": "fing", "perf": ["hat gefangen"], "trans": "ловить", "tKeys": ["ловить", "лови"]}, {"id": 98, "inf": "fernsehen", "hint": "", "aux": "hat", "pras": "er sieht fern", "prat": "sah fern", "perf": ["hat ferngesehen"], "trans": "смотреть телевизор", "tKeys": ["телевизор", "смотреть", "телевиз", "смотре"]}, {"id": 99, "inf": "feststehen", "hint": "", "aux": "hat", "pras": "es steht fest", "prat": "stand fest", "perf": ["hat festgestanden"], "trans": "быть установленным, точно известно", "tKeys": ["установленным", "установленн", "известно", "извест", "точно", "быть", "точн"]}, {"id": 100, "inf": "finden", "hint": "", "aux": "hat", "pras": "er findet", "prat": "fand", "perf": ["hat gefunden"], "trans": "находить", "tKeys": ["находить", "находи"]}, {"id": 101, "inf": "fliegen", "hint": "", "aux": "ist", "pras": "er fliegt", "prat": "flog", "perf": ["ist geflogen"], "trans": "летать", "tKeys": ["летать", "лета"]}, {"id": 102, "inf": "fliehen", "hint": "", "aux": "ist", "pras": "er flieht", "prat": "floh", "perf": ["ist geflohen"], "trans": "бежать, спасаться бегством", "tKeys": ["спасаться", "бегством", "спасать", "бегств", "бежать", "бежа"]}, {"id": 103, "inf": "fließen", "hint": "", "aux": "ist", "pras": "er fließt", "prat": "floss", "perf": ["ist geflossen"], "trans": "течь", "tKeys": ["течь"]}, {"id": 104, "inf": "fressen", "hint": "", "aux": "hat", "pras": "er frisst", "prat": "fraß", "perf": ["hat gefressen"], "trans": "есть (о животных), жрать", "tKeys": ["жрать", "есть", "жрат"]}, {"id": 105, "inf": "frieren", "hint": "", "aux": "hat", "pras": "er friert", "prat": "fror", "perf": ["hat gefroren"], "trans": "мёрзнуть", "tKeys": ["мерзнуть", "мерзну"]}, {"id": 106, "inf": "geben", "hint": "", "aux": "hat", "pras": "er gibt", "prat": "gab", "perf": ["hat gegeben"], "trans": "давать", "tKeys": ["давать", "дава"]}, {"id": 107, "inf": "gefallen", "hint": "", "aux": "hat", "pras": "es gefällt", "prat": "gefiel", "perf": ["hat gefallen"], "trans": "нравиться", "tKeys": ["нравиться", "нравить"]}, {"id": 108, "inf": "gehen", "hint": "", "aux": "ist", "pras": "er geht", "prat": "ging", "perf": ["ist gegangen"], "trans": "идти", "tKeys": ["идти"]}, {"id": 109, "inf": "gelingen", "hint": "", "aux": "ist", "pras": "es gelingt", "prat": "gelang", "perf": ["ist gelungen"], "trans": "удаваться", "tKeys": ["удаваться", "удавать"]}, {"id": 110, "inf": "gelten", "hint": "", "aux": "hat", "pras": "er gilt", "prat": "galt", "perf": ["hat gegolten"], "trans": "действовать, считаться", "tKeys": ["действовать", "действова", "считаться", "считать"]}, {"id": 111, "inf": "genießen", "hint": "", "aux": "hat", "pras": "er genießt", "prat": "genoss", "perf": ["hat genossen"], "trans": "наслаждаться", "tKeys": ["наслаждаться", "наслаждать"]}, {"id": 112, "inf": "geraten", "hint": "", "aux": "ist", "pras": "er gerät", "prat": "geriet", "perf": ["ist geraten"], "trans": "попадать (в ситуацию)", "tKeys": ["попадать", "попада"]}, {"id": 113, "inf": "geschehen", "hint": "", "aux": "ist", "pras": "es geschieht", "prat": "geschah", "perf": ["ist geschehen"], "trans": "происходить, случаться", "tKeys": ["происходить", "происходи", "случаться", "случать"]}, {"id": 114, "inf": "gewinnen", "hint": "", "aux": "hat", "pras": "er gewinnt", "prat": "gewann", "perf": ["hat gewonnen"], "trans": "выигрывать", "tKeys": ["выигрывать", "выигрыва"]}, {"id": 115, "inf": "gießen", "hint": "", "aux": "hat", "pras": "er gießt", "prat": "goss", "perf": ["hat gegossen"], "trans": "лить, поливать", "tKeys": ["поливать", "полива", "лить"]}, {"id": 116, "inf": "greifen", "hint": "", "aux": "hat", "pras": "er greift", "prat": "griff", "perf": ["hat gegriffen"], "trans": "хватать", "tKeys": ["хватать", "хвата"]}, {"id": 117, "inf": "haben", "hint": "", "aux": "hat", "pras": "er hat", "prat": "hatte", "perf": ["hat gehabt"], "trans": "иметь", "tKeys": ["иметь", "имет"]}, {"id": 118, "inf": "halten", "hint": "", "aux": "hat", "pras": "er hält", "prat": "hielt", "perf": ["hat gehalten"], "trans": "держать", "tKeys": ["держать", "держа"]}, {"id": 119, "inf": "hängen", "hint": "", "aux": "hat", "pras": "er hängt", "prat": "hing", "perf": ["hat gehangen"], "trans": "висеть", "tKeys": ["висеть", "висе"]}, {"id": 120, "inf": "heben", "hint": "", "aux": "hat", "pras": "er hebt", "prat": "hob", "perf": ["hat gehoben"], "trans": "поднимать", "tKeys": ["поднимать", "поднима"]}, {"id": 121, "inf": "heißen", "hint": "", "aux": "hat", "pras": "er heißt", "prat": "hieß", "perf": ["hat geheißen"], "trans": "называться", "tKeys": ["называться", "называть"]}, {"id": 122, "inf": "helfen", "hint": "", "aux": "hat", "pras": "er hilft", "prat": "half", "perf": ["hat geholfen"], "trans": "помогать", "tKeys": ["помогать", "помога"]}, {"id": 123, "inf": "herunterladen", "hint": "", "aux": "hat", "pras": "er lädt herunter", "prat": "lud herunter", "perf": ["hat heruntergeladen"], "trans": "скачивать", "tKeys": ["скачивать", "скачива"]}, {"id": 124, "inf": "hervorheben", "hint": "", "aux": "hat", "pras": "er hebt hervor", "prat": "hob hervor", "perf": ["hat hervorgehoben"], "trans": "подчёркивать, выделять", "tKeys": ["подчеркивать", "подчеркива", "выделять", "выделя"]}, {"id": 125, "inf": "hinterlassen", "hint": "", "aux": "hat", "pras": "er hinterlässt", "prat": "hinterließ", "perf": ["hat hinterlassen"], "trans": "оставлять (после себя)", "tKeys": ["оставлять", "оставля"]}, {"id": 126, "inf": "hinweisen", "hint": "", "aux": "hat", "pras": "er weist hin", "prat": "wies hin", "perf": ["hat hingewiesen"], "trans": "указывать (на что-л.)", "tKeys": ["указывать", "указыва"]}, {"id": 127, "inf": "hüpfen", "hint": "", "aux": "ist", "pras": "er hüpft", "prat": "hüpfte", "perf": ["ist gehüpft"], "trans": "прыгать", "tKeys": ["прыгать", "прыга"]}, {"id": 128, "inf": "kennen", "hint": "", "aux": "hat", "pras": "er kennt", "prat": "kannte", "perf": ["hat gekannt"], "trans": "знать (быть знакомым)", "tKeys": ["знать", "знат"]}, {"id": 129, "inf": "klingen", "hint": "", "aux": "hat", "pras": "es klingt", "prat": "klang", "perf": ["hat geklungen"], "trans": "звучать", "tKeys": ["звучать", "звуча"]}, {"id": 130, "inf": "kommen", "hint": "", "aux": "ist", "pras": "er kommt", "prat": "kam", "perf": ["ist gekommen"], "trans": "приходить", "tKeys": ["приходить", "приходи"]}, {"id": 131, "inf": "können", "hint": "", "aux": "hat", "pras": "er kann", "prat": "konnte", "perf": ["hat können", "hat gekonnt"], "trans": "мочь, уметь", "tKeys": ["уметь", "мочь", "умет"]}, {"id": 132, "inf": "laden", "hint": "", "aux": "hat", "pras": "er lädt", "prat": "lud", "perf": ["hat geladen"], "trans": "грузить", "tKeys": ["грузить", "грузи"]}, {"id": 133, "inf": "lassen", "hint": "", "aux": "hat", "pras": "er lässt", "prat": "ließ", "perf": ["hat gelassen"], "trans": "оставлять; позволять", "tKeys": ["оставлять", "позволять", "оставля", "позволя"]}, {"id": 134, "inf": "laufen", "hint": "", "aux": "ist", "pras": "er läuft", "prat": "lief", "perf": ["ist gelaufen"], "trans": "бежать, идти", "tKeys": ["бежать", "бежа", "идти"]}, {"id": 135, "inf": "leiden", "hint": "", "aux": "hat", "pras": "er leidet", "prat": "litt", "perf": ["hat gelitten"], "trans": "страдать", "tKeys": ["страдать", "страда"]}, {"id": 136, "inf": "leihen", "hint": "", "aux": "hat", "pras": "er leiht", "prat": "lieh", "perf": ["hat geliehen"], "trans": "одалживать", "tKeys": ["одалживать", "одалжива"]}, {"id": 137, "inf": "lesen", "hint": "", "aux": "hat", "pras": "er liest", "prat": "las", "perf": ["hat gelesen"], "trans": "читать", "tKeys": ["читать", "чита"]}, {"id": 138, "inf": "liegen", "hint": "", "aux": "hat", "pras": "er liegt", "prat": "lag", "perf": ["hat gelegen"], "trans": "лежать", "tKeys": ["лежать", "лежа"]}, {"id": 139, "inf": "lügen", "hint": "", "aux": "hat", "pras": "er lügt", "prat": "log", "perf": ["hat gelogen"], "trans": "лгать", "tKeys": ["лгать", "лгат"]}, {"id": 140, "inf": "meiden", "hint": "", "aux": "hat", "pras": "er meidet", "prat": "mied", "perf": ["hat gemieden"], "trans": "избегать", "tKeys": ["избегать", "избега"]}, {"id": 141, "inf": "messen", "hint": "", "aux": "hat", "pras": "er misst", "prat": "maß", "perf": ["hat gemessen"], "trans": "измерять", "tKeys": ["измерять", "измеря"]}, {"id": 142, "inf": "missverstehen", "hint": "", "aux": "hat", "pras": "er missversteht", "prat": "missverstand", "perf": ["hat missverstanden"], "trans": "неправильно понимать", "tKeys": ["неправильно", "неправиль", "понимать", "понима"]}, {"id": 143, "inf": "mitbringen", "hint": "", "aux": "hat", "pras": "er bringt mit", "prat": "brachte mit", "perf": ["hat mitgebracht"], "trans": "приносить с собой", "tKeys": ["приносить", "приноси", "собой", "собо"]}, {"id": 144, "inf": "mitnehmen", "hint": "", "aux": "hat", "pras": "er nimmt mit", "prat": "nahm mit", "perf": ["hat mitgenommen"], "trans": "брать с собой", "tKeys": ["брать", "собой", "брат", "собо"]}, {"id": 145, "inf": "mögen", "hint": "", "aux": "hat", "pras": "er mag", "prat": "mochte", "perf": ["hat mögen", "hat gemocht"], "trans": "нравиться, любить", "tKeys": ["нравиться", "нравить", "любить", "люби"]}, {"id": 146, "inf": "müssen", "hint": "", "aux": "hat", "pras": "er muss", "prat": "musste", "perf": ["hat müssen", "hat gemusst"], "trans": "быть должным", "tKeys": ["должным", "должн", "быть"]}, {"id": 147, "inf": "nachgeben", "hint": "", "aux": "hat", "pras": "er gibt nach", "prat": "gab nach", "perf": ["hat nachgegeben"], "trans": "уступать", "tKeys": ["уступать", "уступа"]}, {"id": 148, "inf": "nachlassen", "hint": "", "aux": "hat", "pras": "er lässt nach", "prat": "ließ nach", "perf": ["hat nachgelassen"], "trans": "ослабевать", "tKeys": ["ослабевать", "ослабева"]}, {"id": 149, "inf": "nachweisen", "hint": "", "aux": "hat", "pras": "er weist nach", "prat": "wies nach", "perf": ["hat nachgewiesen"], "trans": "доказывать", "tKeys": ["доказывать", "доказыва"]}, {"id": 150, "inf": "nehmen", "hint": "", "aux": "hat", "pras": "er nimmt", "prat": "nahm", "perf": ["hat genommen"], "trans": "брать", "tKeys": ["брать", "брат"]}, {"id": 151, "inf": "nennen", "hint": "", "aux": "hat", "pras": "er nennt", "prat": "nannte", "perf": ["hat genannt"], "trans": "называть", "tKeys": ["называть", "называ"]}, {"id": 152, "inf": "raten", "hint": "", "aux": "hat", "pras": "er rät", "prat": "riet", "perf": ["hat geraten"], "trans": "советовать; угадывать", "tKeys": ["советовать", "угадывать", "советова", "угадыва"]}, {"id": 153, "inf": "reiben", "hint": "", "aux": "hat", "pras": "er reibt", "prat": "rieb", "perf": ["hat gerieben"], "trans": "тереть", "tKeys": ["тереть", "тере"]}, {"id": 154, "inf": "reiten", "hint": "", "aux": "ist", "pras": "er reitet", "prat": "ritt", "perf": ["ist geritten"], "trans": "ездить верхом", "tKeys": ["верхом", "ездить", "верх", "езди"]}, {"id": 155, "inf": "rennen", "hint": "", "aux": "ist", "pras": "er rennt", "prat": "rannte", "perf": ["ist gerannt"], "trans": "бежать", "tKeys": ["бежать", "бежа"]}, {"id": 156, "inf": "riechen", "hint": "", "aux": "hat", "pras": "er riecht", "prat": "roch", "perf": ["hat gerochen"], "trans": "пахнуть", "tKeys": ["пахнуть", "пахну"]}, {"id": 157, "inf": "rufen", "hint": "", "aux": "hat", "pras": "er ruft", "prat": "rief", "perf": ["hat gerufen"], "trans": "звать, кричать", "tKeys": ["кричать", "звать", "крича", "зват"]}, {"id": 158, "inf": "scheinen", "hint": "", "aux": "hat", "pras": "er scheint", "prat": "schien", "perf": ["hat geschienen"], "trans": "светить; казаться", "tKeys": ["казаться", "светить", "казать", "свети"]}, {"id": 159, "inf": "schieben", "hint": "", "aux": "hat", "pras": "er schiebt", "prat": "schob", "perf": ["hat geschoben"], "trans": "толкать", "tKeys": ["толкать", "толка"]}, {"id": 160, "inf": "schiefgehen", "hint": "", "aux": "ist", "pras": "es geht schief ging", "prat": "schief", "perf": ["ist schiefgegangen"], "trans": "идти не так, срываться", "tKeys": ["срываться", "срывать", "идти"]}, {"id": 161, "inf": "schießen", "hint": "", "aux": "hat", "pras": "er schießt", "prat": "schoss", "perf": ["hat geschossen"], "trans": "стрелять", "tKeys": ["стрелять", "стреля"]}, {"id": 162, "inf": "schlafen", "hint": "", "aux": "hat", "pras": "er schläft", "prat": "schlief", "perf": ["hat geschlafen"], "trans": "спать", "tKeys": ["спать", "спат"]}, {"id": 163, "inf": "schlagen", "hint": "", "aux": "hat", "pras": "er schlägt", "prat": "schlug", "perf": ["hat geschlagen"], "trans": "бить", "tKeys": ["бить"]}, {"id": 164, "inf": "schleichen", "hint": "", "aux": "ist", "pras": "er schleicht", "prat": "schlich", "perf": ["ist geschlichen"], "trans": "красться", "tKeys": ["красться", "красть"]}, {"id": 165, "inf": "schleifen", "hint": "", "aux": "hat", "pras": "er schleift", "prat": "schliff", "perf": ["hat geschliffen"], "trans": "шлифовать, точить", "tKeys": ["шлифовать", "шлифова", "точить", "точи"]}, {"id": 166, "inf": "schließen", "hint": "", "aux": "hat", "pras": "er schließt", "prat": "schloss", "perf": ["hat geschlossen"], "trans": "закрывать", "tKeys": ["закрывать", "закрыва"]}, {"id": 167, "inf": "schmeißen", "hint": "", "aux": "hat", "pras": "er schmeißt", "prat": "schmiss", "perf": ["hat geschmissen"], "trans": "швырять, бросать", "tKeys": ["бросать", "швырять", "броса", "швыря"]}, {"id": 168, "inf": "schneiden", "hint": "", "aux": "hat", "pras": "er schneidet", "prat": "schnitt", "perf": ["hat geschnitten"], "trans": "резать", "tKeys": ["резать", "реза"]}, {"id": 169, "inf": "schreiben", "hint": "", "aux": "hat", "pras": "er schreibt", "prat": "schrieb", "perf": ["hat geschrieben"], "trans": "писать", "tKeys": ["писать", "писа"]}, {"id": 170, "inf": "schreien", "hint": "", "aux": "hat", "pras": "er schreit", "prat": "schrie", "perf": ["hat geschrien"], "trans": "кричать", "tKeys": ["кричать", "крича"]}, {"id": 171, "inf": "schweigen", "hint": "", "aux": "hat", "pras": "er schweigt", "prat": "schwieg", "perf": ["hat geschwiegen"], "trans": "молчать", "tKeys": ["молчать", "молча"]}, {"id": 172, "inf": "schwimmen", "hint": "", "aux": "ist", "pras": "er schwimmt", "prat": "schwamm", "perf": ["ist geschwommen"], "trans": "плавать", "tKeys": ["плавать", "плава"]}, {"id": 173, "inf": "sehen", "hint": "", "aux": "hat", "pras": "er sieht", "prat": "sah", "perf": ["hat gesehen"], "trans": "видеть", "tKeys": ["видеть", "виде"]}, {"id": 174, "inf": "sein", "hint": "", "aux": "ist", "pras": "er ist", "prat": "war", "perf": ["ist gewesen"], "trans": "быть", "tKeys": ["быть"]}, {"id": 175, "inf": "senden", "hint": "", "aux": "hat", "pras": "er sendet", "prat": "sandte/sendete", "perf": ["hat gesandt", "hat gesendet"], "trans": "отправлять", "tKeys": ["отправлять", "отправля"]}, {"id": 176, "inf": "singen", "hint": "", "aux": "hat", "pras": "er singt", "prat": "sang", "perf": ["hat gesungen"], "trans": "петь", "tKeys": ["петь"]}, {"id": 177, "inf": "sinken", "hint": "", "aux": "ist", "pras": "er sinkt", "prat": "sank", "perf": ["ist gesunken"], "trans": "опускаться, тонуть", "tKeys": ["опускаться", "опускать", "тонуть", "тону"]}, {"id": 178, "inf": "sitzen", "hint": "", "aux": "hat", "pras": "er sitzt", "prat": "saß", "perf": ["hat gesessen"], "trans": "сидеть", "tKeys": ["сидеть", "сиде"]}, {"id": 179, "inf": "sollen", "hint": "", "aux": "hat", "pras": "er soll", "prat": "sollte", "perf": ["hat sollen", "hat gesollt"], "trans": "быть должным (по указанию)", "tKeys": ["должным", "должн", "быть"]}, {"id": 180, "inf": "spazieren gehen", "hint": "", "aux": "ist", "pras": "er geht spazieren", "prat": "ging spazieren", "perf": ["ist spazieren gegangen"], "trans": "гулять", "tKeys": ["гулять", "гуля"]}, {"id": 181, "inf": "sprechen", "hint": "", "aux": "hat", "pras": "er spricht", "prat": "sprach", "perf": ["hat gesprochen"], "trans": "говорить", "tKeys": ["говорить", "говори"]}, {"id": 182, "inf": "springen", "hint": "", "aux": "ist", "pras": "er springt", "prat": "sprang", "perf": ["ist gesprungen"], "trans": "прыгать", "tKeys": ["прыгать", "прыга"]}, {"id": 183, "inf": "stattfinden", "hint": "", "aux": "hat", "pras": "es findet statt", "prat": "fand statt", "perf": ["hat stattgefunden"], "trans": "происходить (о событии)", "tKeys": ["происходить", "происходи"]}, {"id": 184, "inf": "stechen", "hint": "", "aux": "hat", "pras": "er sticht", "prat": "stach", "perf": ["hat gestochen"], "trans": "колоть", "tKeys": ["колоть", "коло"]}, {"id": 185, "inf": "stehen", "hint": "", "aux": "hat", "pras": "er steht", "prat": "stand", "perf": ["hat gestanden"], "trans": "стоять", "tKeys": ["стоять", "стоя"]}, {"id": 186, "inf": "stehlen", "hint": "", "aux": "hat", "pras": "er stiehlt", "prat": "stahl", "perf": ["hat gestohlen"], "trans": "красть", "tKeys": ["красть", "крас"]}, {"id": 187, "inf": "steigen", "hint": "", "aux": "ist", "pras": "er steigt", "prat": "stieg", "perf": ["ist gestiegen"], "trans": "подниматься", "tKeys": ["подниматься", "поднимать"]}, {"id": 188, "inf": "sterben", "hint": "", "aux": "ist", "pras": "er stirbt", "prat": "starb", "perf": ["ist gestorben"], "trans": "умирать", "tKeys": ["умирать", "умира"]}, {"id": 189, "inf": "stoßen", "hint": "", "aux": "hat", "pras": "er stößt", "prat": "stieß", "perf": ["hat gestoßen"], "trans": "толкать", "tKeys": ["толкать", "толка"]}, {"id": 190, "inf": "streichen", "hint": "", "aux": "hat", "pras": "er streicht", "prat": "strich", "perf": ["hat gestrichen"], "trans": "красить; вычёркивать", "tKeys": ["вычеркивать", "вычеркива", "красить", "краси"]}, {"id": 191, "inf": "streiten", "hint": "", "aux": "hat", "pras": "er streitet", "prat": "stritt", "perf": ["hat gestritten"], "trans": "ссориться, спорить", "tKeys": ["ссориться", "спорить", "ссорить", "спори"]}, {"id": 192, "inf": "teilnehmen", "hint": "", "aux": "hat", "pras": "er nimmt teil", "prat": "nahm teil", "perf": ["hat teilgenommen"], "trans": "участвовать", "tKeys": ["участвовать", "участвова"]}, {"id": 193, "inf": "tragen", "hint": "", "aux": "hat", "pras": "er trägt", "prat": "trug", "perf": ["hat getragen"], "trans": "нести, носить", "tKeys": ["носить", "нести", "нест", "носи"]}, {"id": 194, "inf": "treffen", "hint": "", "aux": "hat", "pras": "er trifft", "prat": "traf", "perf": ["hat getroffen"], "trans": "встречать", "tKeys": ["встречать", "встреча"]}, {"id": 195, "inf": "treiben", "hint": "", "aux": "hat", "pras": "er treibt", "prat": "trieb", "perf": ["hat getrieben"], "trans": "гнать; заниматься (спортом)", "tKeys": ["заниматься", "занимать", "гнать", "гнат"]}, {"id": 196, "inf": "treten", "hint": "", "aux": "hat/ist", "pras": "er tritt", "prat": "trat", "perf": ["hat getreten", "ist getreten"], "trans": "ступать; пинать", "tKeys": ["ступать", "пинать", "ступа", "пина"]}, {"id": 197, "inf": "trinken", "hint": "", "aux": "hat", "pras": "er trinkt", "prat": "trank", "perf": ["hat getrunken"], "trans": "пить", "tKeys": ["пить"]}, {"id": 198, "inf": "tun", "hint": "", "aux": "hat", "pras": "er tut", "prat": "tat", "perf": ["hat getan"], "trans": "делать", "tKeys": ["делать", "дела"]}, {"id": 199, "inf": "überlassen", "hint": "", "aux": "hat", "pras": "er überlässt", "prat": "überließ", "perf": ["hat überlassen"], "trans": "предоставлять; оставлять (на усмотрение)", "tKeys": ["предоставлять", "предоставля", "оставлять", "оставля"]}, {"id": 200, "inf": "übernehmen", "hint": "", "aux": "hat", "pras": "er übernimmt", "prat": "übernahm", "perf": ["hat übernommen"], "trans": "принимать (обязанности), перенимать", "tKeys": ["перенимать", "принимать", "перенима", "принима"]}, {"id": 201, "inf": "übertreffen", "hint": "", "aux": "hat", "pras": "er übertrifft", "prat": "übertraf", "perf": ["hat übertroffen"], "trans": "превосходить", "tKeys": ["превосходить", "превосходи"]}, {"id": 202, "inf": "übertreiben", "hint": "", "aux": "hat", "pras": "er übertreibt", "prat": "übertrieb", "perf": ["hat übertrieben"], "trans": "преувеличивать", "tKeys": ["преувеличивать", "преувеличива"]}, {"id": 203, "inf": "überweisen", "hint": "", "aux": "hat", "pras": "er überweist", "prat": "überwies", "perf": ["hat überwiesen"], "trans": "переводить (деньги)", "tKeys": ["переводить", "переводи"]}, {"id": 204, "inf": "überwinden", "hint": "", "aux": "hat", "pras": "er überwindet", "prat": "überwand", "perf": ["hat überwunden"], "trans": "преодолевать", "tKeys": ["преодолевать", "преодолева"]}, {"id": 205, "inf": "umfahren", "hint": "объехать вокруг", "aux": "hat", "pras": "er umfährt", "prat": "umfuhr", "perf": ["hat umfahren"], "trans": "объезжать", "tKeys": ["объезжать", "объезжа"]}, {"id": 206, "inf": "umfahren", "hint": "наехать, сбить", "aux": "hat", "pras": "er fährt um", "prat": "fuhr um", "perf": ["hat umgefahren"], "trans": "сбивать, наезжать", "tKeys": ["наезжать", "сбивать", "наезжа", "сбива"]}, {"id": 207, "inf": "umfallen", "hint": "", "aux": "ist", "pras": "er fällt um", "prat": "fiel um", "perf": ["ist umgefallen"], "trans": "опрокидываться, падать", "tKeys": ["опрокидываться", "опрокидывать", "падать", "пада"]}, {"id": 208, "inf": "umgeben", "hint": "", "aux": "hat", "pras": "er umgibt", "prat": "umgab", "perf": ["hat umgeben"], "trans": "окружать", "tKeys": ["окружать", "окружа"]}, {"id": 209, "inf": "umsteigen", "hint": "", "aux": "ist", "pras": "er steigt um", "prat": "stieg um", "perf": ["ist umgestiegen"], "trans": "пересаживаться", "tKeys": ["пересаживаться", "пересаживать"]}, {"id": 210, "inf": "umziehen", "hint": "", "aux": "ist", "pras": "er zieht um", "prat": "zog um", "perf": ["ist umgezogen"], "trans": "переезжать", "tKeys": ["переезжать", "переезжа"]}, {"id": 211, "inf": "unterbrechen", "hint": "", "aux": "hat", "pras": "er unterbricht", "prat": "unterbrach", "perf": ["hat unterbrochen"], "trans": "прерывать", "tKeys": ["прерывать", "прерыва"]}, {"id": 212, "inf": "unterhalten", "hint": "", "aux": "hat", "pras": "er unterhält", "prat": "unterhielt", "perf": ["hat unterhalten"], "trans": "поддерживать (разговор), развлекать", "tKeys": ["поддерживать", "поддержива", "развлекать", "развлека"]}, {"id": 213, "inf": "unterlassen", "hint": "", "aux": "hat", "pras": "er unterlässt", "prat": "unterließ", "perf": ["hat unterlassen"], "trans": "воздерживаться (от чего-л.)", "tKeys": ["воздерживаться", "воздерживать"]}, {"id": 214, "inf": "unternehmen", "hint": "", "aux": "hat", "pras": "er unternimmt", "prat": "unternahm", "perf": ["hat unternommen"], "trans": "предпринимать", "tKeys": ["предпринимать", "предпринима"]}, {"id": 215, "inf": "unterscheiden", "hint": "", "aux": "hat", "pras": "er unterscheidet", "prat": "unterschied", "perf": ["hat unterschieden"], "trans": "различать", "tKeys": ["различать", "различа"]}, {"id": 216, "inf": "unterschreiben", "hint": "", "aux": "hat", "pras": "er unterschreibt", "prat": "unterschrieb", "perf": ["hat unterschrieben"], "trans": "подписывать", "tKeys": ["подписывать", "подписыва"]}, {"id": 217, "inf": "unterstreichen", "hint": "", "aux": "hat", "pras": "er unterstreicht", "prat": "unterstrich", "perf": ["hat unterstrichen"], "trans": "подчёркивать", "tKeys": ["подчеркивать", "подчеркива"]}, {"id": 218, "inf": "verbergen", "hint": "", "aux": "hat", "pras": "er verbirgt", "prat": "verbarg", "perf": ["hat verborgen"], "trans": "скрывать", "tKeys": ["скрывать", "скрыва"]}, {"id": 219, "inf": "verbieten", "hint": "", "aux": "hat", "pras": "er verbietet", "prat": "verbot", "perf": ["hat verboten"], "trans": "запрещать", "tKeys": ["запрещать", "запреща"]}, {"id": 220, "inf": "verbinden", "hint": "", "aux": "hat", "pras": "er verbindet", "prat": "verband", "perf": ["hat verbunden"], "trans": "связывать, соединять", "tKeys": ["связывать", "соединять", "связыва", "соединя"]}, {"id": 221, "inf": "verbrennen", "hint": "", "aux": "hat", "pras": "er verbrennt", "prat": "verbrannte", "perf": ["hat verbrannt"], "trans": "сжигать", "tKeys": ["сжигать", "сжига"]}, {"id": 222, "inf": "verbringen", "hint": "", "aux": "hat", "pras": "er verbringt", "prat": "verbrachte", "perf": ["hat verbracht"], "trans": "проводить (время)", "tKeys": ["проводить", "проводи"]}, {"id": 223, "inf": "vergeben", "hint": "", "aux": "hat", "pras": "er vergibt", "prat": "vergab", "perf": ["hat vergeben"], "trans": "прощать; раздавать", "tKeys": ["раздавать", "прощать", "раздава", "проща"]}, {"id": 224, "inf": "vergessen", "hint": "", "aux": "hat", "pras": "er vergisst", "prat": "vergaß", "perf": ["hat vergessen"], "trans": "забывать", "tKeys": ["забывать", "забыва"]}, {"id": 225, "inf": "vergleichen", "hint": "", "aux": "hat", "pras": "er vergleicht", "prat": "verglich", "perf": ["hat verglichen"], "trans": "сравнивать", "tKeys": ["сравнивать", "сравнива"]}, {"id": 226, "inf": "sich verhalten", "hint": "", "aux": "hat", "pras": "er verhält sich", "prat": "verhielt sich", "perf": ["hat sich verhalten"], "trans": "вести себя", "tKeys": ["вести", "вест"]}, {"id": 227, "inf": "verlassen", "hint": "", "aux": "hat", "pras": "er verlässt", "prat": "verließ", "perf": ["hat verlassen"], "trans": "покидать", "tKeys": ["покидать", "покида"]}, {"id": 228, "inf": "verlieren", "hint": "", "aux": "hat", "pras": "er verliert", "prat": "verlor", "perf": ["hat verloren"], "trans": "терять", "tKeys": ["терять", "теря"]}, {"id": 229, "inf": "vermeiden", "hint": "", "aux": "hat", "pras": "er vermeidet", "prat": "vermied", "perf": ["hat vermieden"], "trans": "избегать", "tKeys": ["избегать", "избега"]}, {"id": 230, "inf": "verraten", "hint": "", "aux": "hat", "pras": "er verrät", "prat": "verriet", "perf": ["hat verraten"], "trans": "выдавать (секрет), предавать", "tKeys": ["предавать", "выдавать", "предава", "выдава"]}, {"id": 231, "inf": "verschieben", "hint": "", "aux": "hat", "pras": "er verschiebt", "prat": "verschob", "perf": ["hat verschoben"], "trans": "откладывать, сдвигать", "tKeys": ["откладывать", "откладыва", "сдвигать", "сдвига"]}, {"id": 232, "inf": "verschlafen", "hint": "", "aux": "hat", "pras": "er verschläft", "prat": "verschlief", "perf": ["hat verschlafen"], "trans": "проспать", "tKeys": ["проспать", "проспа"]}, {"id": 233, "inf": "verschwinden", "hint": "", "aux": "ist", "pras": "er verschwindet", "prat": "verschwand", "perf": ["ist verschwunden"], "trans": "исчезать", "tKeys": ["исчезать", "исчеза"]}, {"id": 234, "inf": "versprechen", "hint": "", "aux": "hat", "pras": "er verspricht", "prat": "versprach", "perf": ["hat versprochen"], "trans": "обещать", "tKeys": ["обещать", "обеща"]}, {"id": 235, "inf": "verstehen", "hint": "", "aux": "hat", "pras": "er versteht", "prat": "verstand", "perf": ["hat verstanden"], "trans": "понимать", "tKeys": ["понимать", "понима"]}, {"id": 236, "inf": "vertragen", "hint": "", "aux": "hat", "pras": "er verträgt", "prat": "vertrug", "perf": ["hat vertragen"], "trans": "переносить, терпеть", "tKeys": ["переносить", "переноси", "терпеть", "терпе"]}, {"id": 237, "inf": "vertreiben", "hint": "", "aux": "hat", "pras": "er vertreibt", "prat": "vertrieb", "perf": ["hat vertrieben"], "trans": "изгонять", "tKeys": ["изгонять", "изгоня"]}, {"id": 238, "inf": "vertreten", "hint": "", "aux": "hat", "pras": "er vertritt", "prat": "vertrat", "perf": ["hat vertreten"], "trans": "представлять (кого-л.), замещать", "tKeys": ["представлять", "представля", "замещать", "замеща"]}, {"id": 239, "inf": "verzeihen", "hint": "", "aux": "hat", "pras": "er verzeiht", "prat": "verzieh", "perf": ["hat verziehen"], "trans": "прощать", "tKeys": ["прощать", "проща"]}, {"id": 240, "inf": "vorhaben", "hint": "", "aux": "hat", "pras": "er hat vor", "prat": "hatte vor", "perf": ["hat vorgehabt"], "trans": "намереваться, планировать", "tKeys": ["намереваться", "планировать", "намеревать", "планирова"]}, {"id": 241, "inf": "vorkommen", "hint": "", "aux": "ist", "pras": "es kommt vor", "prat": "kam vor", "perf": ["ist vorgekommen"], "trans": "случаться, встречаться", "tKeys": ["встречаться", "встречать", "случаться", "случать"]}, {"id": 242, "inf": "vorlesen", "hint": "", "aux": "hat", "pras": "er liest vor", "prat": "las vor", "perf": ["hat vorgelesen"], "trans": "читать вслух", "tKeys": ["читать", "вслух", "вслу", "чита"]}, {"id": 243, "inf": "vorliegen", "hint": "", "aux": "hat", "pras": "er liegt vor", "prat": "lag vor", "perf": ["hat vorgelegen"], "trans": "иметься в наличии", "tKeys": ["иметься", "наличии", "иметь", "налич"]}, {"id": 244, "inf": "vorschlagen", "hint": "", "aux": "hat", "pras": "er schlägt vor", "prat": "schlug vor", "perf": ["hat vorgeschlagen"], "trans": "предлагать", "tKeys": ["предлагать", "предлага"]}, {"id": 245, "inf": "vorschreiben", "hint": "", "aux": "hat", "pras": "er schreibt vor", "prat": "schrieb vor", "perf": ["hat vorgeschrieben"], "trans": "предписывать", "tKeys": ["предписывать", "предписыва"]}, {"id": 246, "inf": "vortragen", "hint": "", "aux": "hat", "pras": "er trägt vor", "prat": "trug vor", "perf": ["hat vorgetragen"], "trans": "докладывать, декламировать", "tKeys": ["декламировать", "декламирова", "докладывать", "докладыва"]}, {"id": 247, "inf": "vorweisen", "hint": "", "aux": "hat", "pras": "er weist vor", "prat": "wies vor", "perf": ["hat vorgewiesen"], "trans": "предъявлять", "tKeys": ["предъявлять", "предъявля"]}, {"id": 248, "inf": "wachsen", "hint": "", "aux": "ist", "pras": "er wächst", "prat": "wuchs", "perf": ["ist gewachsen"], "trans": "расти", "tKeys": ["расти", "раст"]}, {"id": 249, "inf": "wahrnehmen", "hint": "", "aux": "hat", "pras": "er nimmt wahr", "prat": "nahm wahr", "perf": ["hat wahrgenommen"], "trans": "воспринимать, замечать", "tKeys": ["воспринимать", "воспринима", "замечать", "замеча"]}, {"id": 250, "inf": "waschen", "hint": "", "aux": "hat", "pras": "er wäscht", "prat": "wusch", "perf": ["hat gewaschen"], "trans": "мыть, стирать", "tKeys": ["стирать", "стира", "мыть"]}, {"id": 251, "inf": "wegfallen", "hint": "", "aux": "ist", "pras": "er fällt weg", "prat": "fiel weg", "perf": ["ist weggefallen"], "trans": "отпадать, отменяться", "tKeys": ["отменяться", "отменять", "отпадать", "отпада"]}, {"id": 252, "inf": "weglassen", "hint": "", "aux": "hat", "pras": "er lässt weg", "prat": "ließ weg", "perf": ["hat weggelassen"], "trans": "опускать, не включать", "tKeys": ["включать", "опускать", "включа", "опуска"]}, {"id": 253, "inf": "weitergeben", "hint": "", "aux": "hat", "pras": "er gibt weiter", "prat": "gab weiter", "perf": ["hat weitergegeben"], "trans": "передавать дальше", "tKeys": ["передавать", "передава", "дальше", "даль"]}, {"id": 254, "inf": "weiterkommen", "hint": "", "aux": "ist", "pras": "er kommt weiter", "prat": "kam weiter", "perf": ["ist weitergekommen"], "trans": "продвигаться дальше", "tKeys": ["продвигаться", "продвигать", "дальше", "даль"]}, {"id": 255, "inf": "werben", "hint": "", "aux": "hat", "pras": "er wirbt", "prat": "warb", "perf": ["hat geworben"], "trans": "рекламировать, вербовать", "tKeys": ["рекламировать", "рекламирова", "вербовать", "вербова"]}, {"id": 256, "inf": "werden", "hint": "", "aux": "ist", "pras": "er wird", "prat": "wurde", "perf": ["ist geworden"], "trans": "становиться", "tKeys": ["становиться", "становить"]}, {"id": 257, "inf": "werfen", "hint": "", "aux": "hat", "pras": "er wirft", "prat": "warf", "perf": ["hat geworfen"], "trans": "бросать", "tKeys": ["бросать", "броса"]}, {"id": 258, "inf": "widerrufen", "hint": "", "aux": "hat", "pras": "er widerruft", "prat": "widerrief", "perf": ["hat widerrufen"], "trans": "отзывать (заявление), отменять", "tKeys": ["отзывать", "отменять", "отзыва", "отменя"]}, {"id": 259, "inf": "widersprechen", "hint": "", "aux": "hat", "pras": "er widerspricht", "prat": "widersprach", "perf": ["hat widersprochen"], "trans": "противоречить", "tKeys": ["противоречить", "противоречи"]}, {"id": 260, "inf": "wiedergeben", "hint": "", "aux": "hat", "pras": "er gibt wieder", "prat": "gab wieder", "perf": ["hat wiedergegeben"], "trans": "передавать (содержание); возвращать", "tKeys": ["возвращать", "передавать", "возвраща", "передава"]}, {"id": 261, "inf": "wiedersehen", "hint": "", "aux": "hat", "pras": "er sieht wieder", "prat": "sah wieder", "perf": ["hat wiedergesehen"], "trans": "увидеться снова", "tKeys": ["увидеться", "увидеть", "снова", "снов"]}, {"id": 262, "inf": "wiegen", "hint": "", "aux": "hat", "pras": "er wiegt", "prat": "wog", "perf": ["hat gewogen"], "trans": "весить", "tKeys": ["весить", "веси"]}, {"id": 263, "inf": "wissen", "hint": "", "aux": "hat", "pras": "er weiß", "prat": "wusste", "perf": ["hat gewusst"], "trans": "знать", "tKeys": ["знать", "знат"]}, {"id": 264, "inf": "wollen", "hint": "", "aux": "hat", "pras": "er will", "prat": "wollte", "perf": ["hat wollen", "hat gewollt"], "trans": "хотеть", "tKeys": ["хотеть", "хоте"]}, {"id": 265, "inf": "ziehen", "hint": "", "aux": "hat", "pras": "er zieht", "prat": "zog", "perf": ["hat gezogen"], "trans": "тянуть, тащить", "tKeys": ["тащить", "тянуть", "тащи", "тяну"]}, {"id": 266, "inf": "zugeben", "hint": "", "aux": "hat", "pras": "er gibt zu", "prat": "gab zu", "perf": ["hat zugegeben"], "trans": "признавать(ся), допускать", "tKeys": ["признавать", "допускать", "признава", "допуска"]}, {"id": 267, "inf": "zurechtfinden", "hint": "", "aux": "hat", "pras": "er findet zurecht", "prat": "fand zurecht", "perf": ["hat zurechtgefunden"], "trans": "разбираться, ориентироваться", "tKeys": ["ориентироваться", "ориентировать", "разбираться", "разбирать"]}, {"id": 268, "inf": "zurücktreten", "hint": "", "aux": "ist", "pras": "er tritt zurück", "prat": "trat zurück", "perf": ["ist zurückgetreten"], "trans": "отступать, уходить в отставку", "tKeys": ["отступать", "отставку", "отступа", "уходить", "отстав", "уходи"]}, {"id": 269, "inf": "zusammentreffen", "hint": "", "aux": "ist", "pras": "er trifft zusammen", "prat": "traf zusammen", "perf": ["ist zusammengetroffen"], "trans": "встречаться (совпадать)", "tKeys": ["встречаться", "встречать"]}, {"id": 270, "inf": "zwingen", "hint": "", "aux": "hat", "pras": "er zwingt", "prat": "zwang", "perf": ["hat gezwungen"], "trans": "принуждать", "tKeys": ["принуждать", "принужда"]}];
+
+const MAXID = VERBS.length;
+const BYID = {}; VERBS.forEach(v=>BYID[v.id]=v);
+
+/* ---------- ПРОГРЕСС ---------- */
+const STORE_KEY = "deutsch_verben_1_270_v1";
+let status = {};
+function defaultStatus(){ const s={}; VERBS.forEach(v=>s[v.id]="new"); return s; }
+function loadProgress(){
+  status = defaultStatus();
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){ const o=JSON.parse(raw); if(o&&o.status){ Object.keys(o.status).forEach(k=>{ if(status[k]!==undefined) status[k]=o.status[k]; }); } }
+    const rr = localStorage.getItem(STORE_KEY+"_range");
+    if(rr){ const o=JSON.parse(rr); if(o&&o.from){ document.getElementById("rFrom").value=o.from; document.getElementById("rTo").value=o.to; } }
+  }catch(e){}
+  updateSavedInfo(new Date());
+}
+function saveProgress(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({status, savedAt:Date.now()})); updateSavedInfo(new Date()); }
+  catch(e){ document.getElementById("savedInfo").textContent = "⚠ Автосохранение недоступно — используйте «Экспорт»."; }
+}
+function saveRange(){ try{ localStorage.setItem(STORE_KEY+"_range", JSON.stringify(getRange())); }catch(e){} }
+function updateSavedInfo(d){ const el=document.getElementById("savedInfo"); try{ el.textContent="💾 Прогресс сохранён · "+d.toLocaleString('ru-RU'); }catch(e){ el.textContent=""; } }
+
+/* ---------- ДИАПАЗОН ---------- */
+function getRange(){ return {from:parseInt(document.getElementById("rFrom").value,10), to:parseInt(document.getElementById("rTo").value,10)}; }
+function rangeValid(){ const {from,to}=getRange(); return Number.isInteger(from)&&Number.isInteger(to)&&from>=1&&to<=MAXID&&from<=to; }
+function inRange(v){ const {from,to}=getRange(); return v.id>=from && v.id<=to; }
+function rangeVerbs(){ return VERBS.filter(inRange); }
+const PRESETS=[[1,35],[36,70],[71,105],[106,140],[141,175],[176,210],[211,245],[246,270]];
+function renderPresets(){
+  const box=document.getElementById("presets"); box.innerHTML="";
+  PRESETS.forEach(([a,b])=>{ const btn=document.createElement("button"); btn.textContent=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
+    btn.addEventListener("click",()=>{ document.getElementById("rFrom").value=a; document.getElementById("rTo").value=b; onRangeChange(); }); box.appendChild(btn); });
+  const all=document.createElement("button"); all.textContent="Все 1–270"; all.dataset.a=1; all.dataset.b=MAXID;
+  all.addEventListener("click",()=>{ document.getElementById("rFrom").value=1; document.getElementById("rTo").value=MAXID; onRangeChange(); }); box.appendChild(all);
+}
+function markActivePreset(){ const {from,to}=getRange(); document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("sel", parseInt(b.dataset.a)===from && parseInt(b.dataset.b)===to)); }
+function onRangeChange(){
+  const warn=document.getElementById("rWarn"), startBtn=document.getElementById("startBtn");
+  if(!rangeValid()){ warn.classList.remove("hide"); warn.textContent="Укажите корректный диапазон: числа от 1 до "+MAXID+", «от» ≤ «до»."; startBtn.disabled=true; document.getElementById("rangeCount").textContent=""; }
+  else{ warn.classList.add("hide"); startBtn.disabled=false; saveRange(); const n=rangeVerbs().length; document.getElementById("rangeCount").textContent="· "+n+" "+plural(n,["глагол","глагола","глаголов"]); }
+  markActivePreset(); refreshFolders(); renderModes();
+  if(dictFilter==="range") renderDict();
+}
+function plural(n,f){ const a=n%10,b=n%100; if(a===1&&b!==11)return f[0]; if(a>=2&&a<=4&&(b<10||b>=20))return f[1]; return f[2]; }
+
+/* ---------- СЧЁТЧИКИ ---------- */
+function counts(){ let l=0,n=0,nw=0; rangeVerbs().forEach(v=>{ const s=status[v.id]; if(s==="learned")l++; else if(s==="notlearned")n++; else nw++; }); return {learned:l,notlearned:n,"new":nw}; }
+function refreshFolders(){ const c=counts(); document.getElementById("cLearned").textContent=c.learned; document.getElementById("cNot").textContent=c.notlearned; document.getElementById("cNew").textContent=c["new"];
+  const {from,to}=getRange(); document.getElementById("foldersSub").textContent = rangeValid()? ("в диапазоне "+from+"–"+to) : ""; }
+
+/* ---------- ПРОВЕРКА ---------- */
+function foldDe(s){ return s.replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss'); }
+function normPerf(s){ return foldDe((s||"").toLowerCase()).replace(/[.,;!]/g," ").replace(/\s+/g," ").trim(); }
+function normRu(s){ return (s||"").toLowerCase().replace(/ё/g,"е").replace(/[.,;!?()]/g," ").replace(/\s+/g," ").trim(); }
+function checkPerf(v,ans){ const a=normPerf(ans); if(!a)return false; for(const p of v.perf){ if(a===normPerf(p))return true; } return false; }
+function checkTrans(v,ans){ const a=normRu(ans); if(!a)return false;
+  for(const k of v.tKeys){ const kk=normRu(k); if(kk.length>=3 && a.includes(kk)) return true;
+    const words=a.split(" ").filter(w=>w.length>=4); for(const w of words){ if(kk.includes(w)) return true; } } return false; }
+
+/* ---------- НАВИГАЦИЯ / ЭКРАНЫ ---------- */
+const SCREENS={home:"startScreen",dict:"dictScreen",quiz:"quizScreen",result:"resultScreen"};
+function show(name){ Object.values(SCREENS).forEach(id=>document.getElementById(id).classList.add("hide")); document.getElementById(SCREENS[name]).classList.remove("hide");
+  const navVisible = (name==="home"||name==="dict"); document.getElementById("nav").classList.toggle("hide", !navVisible);
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("sel", b.dataset.tab===name));
+  window.scrollTo(0,0);
+}
+
+/* ---------- РЕЖИМЫ ТЕСТА ---------- */
+function renderModes(){
+  const c=counts();
+  const modes=[
+    {k:"all",t:"Весь диапазон",d:"Все глаголы выбранного интервала",cnt:c.learned+c.notlearned+c["new"]},
+    {k:"new",t:"Новые + невыученные",d:"Всё, что ещё не в «Выучено»",cnt:c["new"]+c.notlearned},
+    {k:"notlearned",t:"Только невыученные",d:"Работа над ошибками",cnt:c.notlearned},
+    {k:"learned",t:"Только выученные",d:"Проверить, что не забылось",cnt:c.learned},
+  ];
+  const box=document.getElementById("modeList"); const prev=selectedMode(); box.innerHTML="";
+  modes.forEach((m,i)=>{ const sel=(prev? m.k===prev : i===0); const row=document.createElement("div");
+    row.className="mode-row"+(sel?" sel":""); row.dataset.mode=m.k;
+    row.innerHTML=`<input type="radio" name="mode" ${sel?"checked":""} style="accent-color:var(--accent2)"><div><div class="t">${m.t}</div><div class="d">${m.d}</div></div><div class="cnt">${m.cnt}</div>`;
+    row.addEventListener("click",()=>{ document.querySelectorAll(".mode-row").forEach(r=>r.classList.remove("sel")); row.classList.add("sel"); row.querySelector("input").checked=true; });
+    box.appendChild(row); });
+}
+function selectedMode(){ const r=document.querySelector(".mode-row.sel"); return r?r.dataset.mode:null; }
+
+/* ---------- ТЕСТ ---------- */
+let session=null, curEval=null;
+function buildQueue(mode){
+  let pool=rangeVerbs();
+  if(mode==="notlearned") pool=pool.filter(v=>status[v.id]==="notlearned");
+  else if(mode==="new") pool=pool.filter(v=>status[v.id]!=="learned");
+  else if(mode==="learned") pool=pool.filter(v=>status[v.id]==="learned");
+  pool=pool.slice();
+  if(document.getElementById("chkShuffle").checked){ for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; } }
+  return pool;
+}
+function startQuiz(mode){
+  if(!rangeValid()){ alert("Сначала укажите корректный диапазон глаголов."); show("home"); return; }
+  const askT=document.getElementById("chkTrans").checked, askP=document.getElementById("chkPerf").checked;
+  if(!askT&&!askP){ alert("Выберите хотя бы одно: перевод или Perfekt."); return; }
+  const queue=buildQueue(mode);
+  if(queue.length===0){ alert("В этой папке/диапазоне нет глаголов для теста."); return; }
+  session={queue,idx:0,results:[],askT,askP}; show("quiz"); renderQuestion();
+}
+function renderQuestion(){
+  const v=session.queue[session.idx], total=session.queue.length;
+  document.getElementById("pfill").style.width=(session.idx/total*100)+"%";
+  document.getElementById("qpos").textContent=`Глагол ${session.idx+1} из ${total} · №${v.id}`;
+  document.getElementById("qscore").textContent=`✓ ${session.results.filter(r=>r.ok).length}`;
+  document.getElementById("qverb").innerHTML=`${v.inf}`+(v.hint?` <span class="hint">(${v.hint})</span>`:"");
+  document.getElementById("fTrans").classList.toggle("hide",!session.askT);
+  document.getElementById("fPerf").classList.toggle("hide",!session.askP);
+  const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf");
+  it.value="";ip.value="";it.className="";ip.className="";it.disabled=false;ip.disabled=false;
+  document.getElementById("corrTrans").classList.add("hide"); document.getElementById("corrPerf").classList.add("hide"); document.getElementById("ovTrans").classList.add("hide");
+  document.getElementById("checkBtn").classList.remove("hide"); document.getElementById("nextBtn").classList.add("hide");
+  setTimeout(()=>{(session.askT?it:ip).focus();},50);
+}
+function doCheck(){
+  const v=session.queue[session.idx]; const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf"); let okT=true, okP=true;
+  if(session.askT){ okT=checkTrans(v,it.value); it.disabled=true; it.classList.add(okT?"good":"bad");
+    const ct=document.getElementById("corrTrans"); ct.classList.remove("hide");
+    ct.innerHTML=okT?`<span class="ok">✓ Верно.</span> Значение: <span class="sol">${v.trans}</span>`:`<span class="bad">✗ Ошибка.</span> Правильно: <span class="sol">${v.trans}</span>`;
+    document.getElementById("ovTrans").classList.remove("hide"); styleOverride(okT); }
+  if(session.askP){ okP=checkPerf(v,ip.value); ip.disabled=true; ip.classList.add(okP?"good":"bad");
+    const cp=document.getElementById("corrPerf"); cp.classList.remove("hide");
+    cp.innerHTML=okP?`<span class="ok">✓ Верно.</span> <span class="sol">${v.perf.join(" / ")}</span>`:`<span class="bad">✗ Ошибка.</span> Правильно: <span class="sol">${v.perf.join(" / ")}</span>`; }
+  curEval={okT,okP,v,ansT:it.value,ansP:ip.value};
+  document.getElementById("checkBtn").classList.add("hide"); document.getElementById("nextBtn").classList.remove("hide"); document.getElementById("nextBtn").focus();
+}
+function styleOverride(okT){ const b=document.querySelectorAll('#ovTrans .chip'); b.forEach(x=>x.classList.remove("on-ok","on-bad")); if(okT)b[0].classList.add("on-ok"); else b[1].classList.add("on-bad"); }
+function nextQuestion(){
+  const e=curEval; const ok=(session.askT?e.okT:true)&&(session.askP?e.okP:true);
+  session.results.push({id:e.v.id,v:e.v,okT:e.okT,okP:e.okP,ok,ansT:e.ansT,ansP:e.ansP,askT:session.askT,askP:session.askP});
+  status[e.v.id]=ok?"learned":"notlearned"; saveProgress(); refreshFolders();
+  session.idx++; if(session.idx>=session.queue.length) showResults(); else renderQuestion();
+}
+function showResults(){
+  const res=session.results, total=res.length, correct=res.filter(r=>r.ok).length, pct=Math.round(correct/total*100);
+  document.getElementById("pfill").style.width="100%"; document.getElementById("rScore").textContent=`${correct} / ${total}`;
+  const verdict=pct===100?"Идеально! 🎉":pct>=80?"Отличный результат":pct>=50?"Неплохо, но есть над чем поработать":"Нужно ещё повторить";
+  document.getElementById("rSub").textContent=`${pct}% · ${verdict}`;
+  const c=counts(); document.getElementById("rLearned").textContent=c.learned; document.getElementById("rNot").textContent=c.notlearned; document.getElementById("rNew").textContent=c["new"];
+  const {from,to}=getRange(); document.getElementById("rFoldersSub").textContent="в диапазоне "+from+"–"+to;
+  const wrong=res.filter(r=>!r.ok); const errBody=document.getElementById("errBody"), errIntro=document.getElementById("errIntro");
+  if(wrong.length===0){ errIntro.textContent="Ошибок нет — все глаголы отправлены в папку «Выучено». 🎉"; errBody.innerHTML=""; }
+  else{ errIntro.innerHTML=`Ошибок: <b>${wrong.length}</b> из ${total}. Эти глаголы теперь в папке 📕 «Невыучено».`; let rows="";
+    wrong.forEach(r=>{ const v=r.v;
+      let tCell = !r.askT?"—":(r.okT?`<span class="badge s">верно</span>`:`<div class="you">✗ ${escapeHtml(r.ansT)||"—"}</div><div class="sol">✓ ${v.trans}</div>`);
+      let pCell = !r.askP?"—":(r.okP?`<span class="badge s">верно</span>`:`<div class="you">✗ ${escapeHtml(r.ansP)||"—"}</div><div class="sol">✓ ${v.perf.join(" / ")}</div>`);
+      rows+=`<tr><td><b>${v.inf}</b>${v.hint?` <span class="muted">(${v.hint})</span>`:""}<div class="muted" style="font-size:11px">№${v.id} · ${v.aux}</div></td><td>${tCell}</td><td>${pCell}</td></tr>`; });
+    errBody.innerHTML=`<table><thead><tr><th>Глагол</th><th>Перевод</th><th>Perfekt</th></tr></thead><tbody>${rows}</tbody></table>`; }
+  session._wrongIds=wrong.map(r=>r.id); show("result");
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
+function retryWrong(){ const ids=(session&&session._wrongIds)||[]; if(ids.length===0){ alert("В этом тесте не было ошибок."); return; }
+  const askT=document.getElementById("chkTrans").checked, askP=document.getElementById("chkPerf").checked; let queue=ids.map(id=>BYID[id]);
+  if(document.getElementById("chkShuffle").checked){ for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]];} }
+  session={queue,idx:0,results:[],askT,askP}; show("quiz"); renderQuestion(); }
+
+/* ---------- СЛОВАРЬ ---------- */
+let dictFilter="all";
+function renderDict(){
+  const q=normRu(document.getElementById("dictSearch").value);
+  let list=VERBS.slice();
+  if(dictFilter==="range"){ if(rangeValid()) list=list.filter(inRange); }
+  else if(dictFilter!=="all") list=list.filter(v=>status[v.id]===dictFilter);
+  if(q) list=list.filter(v=> String(v.id)===q || normRu(v.inf).includes(q) || normRu(v.trans).includes(q) || normPerf(v.perf.join(" ")).includes(foldDe(q)));
+  const hideT=document.getElementById("hideTrans").checked, hideP=document.getElementById("hidePerf").checked;
+  const {from,to}=getRange();
+  document.getElementById("dictSub").textContent = dictFilter==="range"&&rangeValid()? ("диапазон "+from+"–"+to) : "все формы для повторения";
+  document.getElementById("dictCount").textContent = list.length+" "+plural(list.length,["глагол","глагола","глаголов"]);
+  const body=document.getElementById("dictBody"), empty=document.getElementById("dictEmpty");
+  if(list.length===0){ body.innerHTML=""; empty.textContent="Ничего не найдено."; return; } else empty.textContent="";
+  let html="";
+  list.forEach(v=>{
+    const st=status[v.id];
+    const perfCls = v.perf[0].startsWith("ist")?"ist":"hat";
+    const perfTxt = v.perf.join(" / ");
+    html+=`<div class="drow" data-id="${v.id}">
+      <div><div class="dinf"><span class="sdot ${st}"></span><span class="num">${v.id}.</span>${v.inf}${v.hint?` <span class="hint">(${v.hint})</span>`:""}</div>
+        <div class="dforms">${v.pras} · ${v.prat}</div></div>
+      <div class="dperf ${perfCls} ${hideP?'masked':''}">${perfTxt}</div>
+      <div class="dtrans ${hideT?'masked':''}">${v.trans}</div>
+      <div class="dactions">
+        <button data-set="learned" data-id="${v.id}" title="Выучено" class="${st==='learned'?'act':''}">📗</button>
+        <button data-set="notlearned" data-id="${v.id}" title="Невыучено" class="${st==='notlearned'?'act':''}">📕</button>
+        <button data-set="new" data-id="${v.id}" title="Новое" class="${st==='new'?'act':''}">📘</button>
+      </div></div>`;
+  });
+  body.innerHTML=html;
+  body.querySelectorAll("button[data-set]").forEach(b=>b.addEventListener("click",()=>{ status[b.dataset.id]=b.dataset.set; saveProgress(); refreshFolders(); renderDict(); if(dictFilter!=="all"&&dictFilter!=="range"){} }));
+  body.querySelectorAll(".masked").forEach(el=>el.addEventListener("click",()=>el.classList.toggle("revealed")));
+}
+
+/* ---------- ЭКСПОРТ / ИМПОРТ ---------- */
+function tsStamp(d){ const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"_"+p(d.getHours())+"-"+p(d.getMinutes())+"-"+p(d.getSeconds()); }
+function counts_all(){ let l=0,n=0,nw=0; VERBS.forEach(v=>{const s=status[v.id]; if(s==="learned")l++;else if(s==="notlearned")n++;else nw++;}); return {learned:l,notlearned:n,"new":nw,total:VERBS.length}; }
+function exportProgress(){
+  const now=new Date(); const grp=s=>VERBS.filter(v=>status[v.id]===s).map(v=>v.id+". "+v.inf);
+  const data={app:"deutsch_verben_1_270",version:2,savedAt:now.toISOString(), summary:counts_all(), folders:{learned:grp("learned"),notlearned:grp("notlearned"),new:grp("new")}, status};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=url; a.download="verben_progress_"+tsStamp(now)+".json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importProgress(file){ const rd=new FileReader();
+  rd.onload=()=>{ try{ const o=JSON.parse(rd.result); const st=o.status||o; let n=0;
+    Object.keys(st).forEach(k=>{ if(status[k]!==undefined && ["learned","notlearned","new"].includes(st[k])){ status[k]=st[k]; n++; } });
+    saveProgress(); refreshFolders(); renderModes(); renderDict(); alert("Импортировано глаголов: "+n);
+  }catch(e){ alert("Не удалось прочитать файл прогресса."); } }; rd.readAsText(file); }
+
+/* ---------- СОБЫТИЯ ---------- */
+document.querySelectorAll("#nav button").forEach(b=>b.addEventListener("click",()=>{ const t=b.dataset.tab; if(t==="dict") renderDict(); show(t); }));
+document.getElementById("dictShortcut").addEventListener("click",()=>{ renderDict(); show("dict"); });
+document.getElementById("rFrom").addEventListener("input",onRangeChange);
+document.getElementById("rTo").addEventListener("input",onRangeChange);
+document.getElementById("startBtn").addEventListener("click",()=>startQuiz(selectedMode()||"all"));
+document.getElementById("checkBtn").addEventListener("click",doCheck);
+document.getElementById("nextBtn").addEventListener("click",nextQuestion);
+document.getElementById("quitBtn").addEventListener("click",()=>{ if(session&&session.results.length) showResults(); else show("home"); });
+document.getElementById("retryWrong").addEventListener("click",retryWrong);
+document.getElementById("againBtn").addEventListener("click",()=>{ refreshFolders(); renderModes(); show("home"); });
+document.getElementById("exportBtn").addEventListener("click",exportProgress);
+document.getElementById("exportBtn2").addEventListener("click",exportProgress);
+document.getElementById("importBtn").addEventListener("click",()=>document.getElementById("fileInput").click());
+document.getElementById("fileInput").addEventListener("change",e=>{ if(e.target.files[0]) importProgress(e.target.files[0]); e.target.value=""; });
+document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("Сбросить весь прогресс (все 270 глаголов станут «новыми»)?")){ status=defaultStatus(); saveProgress(); refreshFolders(); renderModes(); renderDict(); } });
+document.getElementById("dictSearch").addEventListener("input",renderDict);
+document.getElementById("hideTrans").addEventListener("change",renderDict);
+document.getElementById("hidePerf").addEventListener("change",renderDict);
+document.querySelectorAll('#dictFilters button').forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll('#dictFilters button').forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); dictFilter=b.dataset.f; renderDict(); }));
+document.addEventListener("keydown",e=>{ if(document.getElementById("quizScreen").classList.contains("hide"))return; if(e.key==="Enter"){ e.preventDefault(); if(!document.getElementById("nextBtn").classList.contains("hide")) nextQuestion(); else doCheck(); } });
+document.querySelectorAll('#ovTrans .chip').forEach(b=>b.addEventListener("click",()=>{ if(!curEval)return; const val=b.dataset.val==="1"; curEval.okT=val; styleOverride(val);
+  const it=document.getElementById("inTrans"); it.classList.remove("good","bad"); it.classList.add(val?"good":"bad");
+  document.getElementById("corrTrans").innerHTML=val?`<span class="ok">✓ Засчитано.</span> Значение: <span class="sol">${curEval.v.trans}</span>`:`<span class="bad">✗ Ошибка.</span> Правильно: <span class="sol">${curEval.v.trans}</span>`; }));
+
+/* ---------- INIT ---------- */
+loadProgress(); renderPresets(); onRangeChange(); show("home");
+</script>
+</body>
+</html>
