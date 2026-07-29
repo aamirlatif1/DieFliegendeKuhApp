@@ -1,26 +1,26 @@
-# Как установить и начать пользоваться тренажёром
+# Как установить и начать пользоваться DieFliegendeKuh
 
-Приложение — это один HTML-файл `UnregelmaessigeVerbenLernenApp.html`. Ему не нужен сервер, установка или интернет: он работает прямо в браузере.
+Приложение — это один HTML-файл `DieFliegendeKuhApp.html`. Ему не нужен сервер, установка или интернет: он работает прямо в браузере.
 
 ## 1. Скачать файл
 
 Выберите один из вариантов.
 
 **Вариант А — без Git (проще всего):**
-1. Откройте страницу репозитория: https://github.com/kiselkath/UnregelmaessigeVerbenLerningApp
-2. Нажмите на файл `UnregelmaessigeVerbenLernenApp.html`.
+1. Откройте страницу репозитория: https://github.com/kiselkath/DieFliegendeKuhApp
+2. Нажмите на файл `DieFliegendeKuhApp.html`.
 3. Нажмите кнопку **Download raw file** (или значок скачивания).
 4. Сохраните файл на компьютер (например, на Рабочий стол).
 
 **Вариант Б — через Git:**
 ```
-git clone https://github.com/kiselkath/UnregelmaessigeVerbenLerningApp.git
+git clone https://github.com/kiselkath/DieFliegendeKuhApp.git
 ```
-Файл `UnregelmaessigeVerbenLernenApp.html` появится в скачанной папке.
+Файл `DieFliegendeKuhApp.html` появится в скачанной папке.
 
 ## 2. Открыть приложение
 
-Дважды кликните по файлу `UnregelmaessigeVerbenLernenApp.html` — он откроется в браузере по умолчанию (Chrome, Firefox, Edge, Safari — подойдёт любой современный браузер).
+Дважды кликните по файлу `DieFliegendeKuhApp.html` — он откроется в браузере по умолчанию (Chrome, Firefox, Edge, Safari — подойдёт любой современный браузер).
 
 Если файл не открылся сам: откройте браузер и перетащите файл в окно браузера, либо `Файл → Открыть файл...`.
 

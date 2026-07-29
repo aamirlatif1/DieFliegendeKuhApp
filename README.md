@@ -1,7 +1,9 @@
-# Тренажёр и словарь: неправильные глаголы (все 270)
+# DieFliegendeKuh — тренажёр и словарь: неправильные глаголы (все 270)
+
+![DieFliegendeKuh logo](DieFliegendeKuh-logo.png)
 
 Интерактивное HTML-приложение — **все глаголы №1–270**.
-Файл: `UnregelmaessigeVerbenLernenApp.html`.
+Файл: `DieFliegendeKuhApp.html`.
 
 Вверху — переключатель языка интерфейса **RUS/ENG** и две вкладки: **🎯 Тренажёр** и **📖 Словарь**.
 
