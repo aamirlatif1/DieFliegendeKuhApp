@@ -4,14 +4,19 @@ Illustrations for the **🗂️ Учить** tab (Tinder-style cards). Not autog
 add them here manually, one per verb.
 
 ## Naming
-`NNN.webp`, where `NNN` is the verb's `№` from `Unregelmaessige_Verben.pdf` /
-the app's dictionary, zero-padded to 3 digits:
+`NNN-infinitiv.webp` — zero-padded `№` from the app's dictionary, a hyphen,
+then the verb's infinitive exactly as shown in the app (spaces in
+reflexive/two-word verbs become hyphens, e.g. `sich befinden` → `sich-befinden`).
+
+The number stays in the filename because **two pairs of verbs share the same
+infinitive** (`033-ausziehen` / `034-ausziehen`, `205-umfahren` /
+`206-umfahren`) — without it those four files would collide.
 
 ```
-verb-images/001.webp   # № 1  — abbrechen
-verb-images/002.webp   # № 2  — abfahren
+verb-images/001-abbrechen.webp   # № 1
+verb-images/002-abfahren.webp    # № 2
 ...
-verb-images/270.webp   # № 270 — zwingen
+verb-images/270-zwingen.webp     # № 270
 ```
 
 ## Format
@@ -19,9 +24,284 @@ verb-images/270.webp   # № 270 — zwingen
 - Source size **~800×1200 px** (2x for retina card density)
 - Target weight **30–80 KB** per image (≈10–20 MB total for all 270)
 - Files stay outside the HTML (not base64) — the app loads them lazily,
-  one/two cards ahead at a time, as `<img src="verb-images/NNN.webp" loading="lazy">`
+  one/two cards ahead at a time, as `<img src="verb-images/NNN-infinitiv.webp" loading="lazy">`
 
 ## Missing files are fine
 The blur effect (card states 1–2) is a CSS filter over the same image — no
-separate blurred asset needed. If a file for a given number is missing, the
+separate blurred asset needed. If a file for a given verb is missing, the
 card falls back to a neutral placeholder and the rest of the tab keeps working.
+
+## Full checklist (all 270 filenames)
+
+```
+001-abbrechen.webp
+002-abfahren.webp
+003-abgeben.webp
+004-abhängen.webp
+005-abheben.webp
+006-abnehmen.webp
+007-abschließen.webp
+008-anbieten.webp
+009-anerkennen.webp
+010-anfangen.webp
+011-angeben.webp
+012-ankommen.webp
+013-annehmen.webp
+014-anrufen.webp
+015-ansehen.webp
+016-ansprechen.webp
+017-anwenden.webp
+018-auffallen.webp
+019-aufgeben.webp
+020-aufheben.webp
+021-aufladen.webp
+022-aufnehmen.webp
+023-aufstehen.webp
+024-auftreten.webp
+025-ausfallen.webp
+026-ausgehen.webp
+027-ausleihen.webp
+028-ausschlafen.webp
+029-aussehen.webp
+030-aussprechen.webp
+031-aussteigen.webp
+032-ausweichen.webp
+033-ausziehen.webp
+034-ausziehen.webp
+035-backen.webp
+036-befehlen.webp
+037-sich-befinden.webp
+038-beginnen.webp
+039-begreifen.webp
+040-behalten.webp
+041-beibringen.webp
+042-beißen.webp
+043-bekommen.webp
+044-beraten.webp
+045-beschließen.webp
+046-besprechen.webp
+047-bestehen.webp
+048-betreffen.webp
+049-betreiben.webp
+050-betrügen.webp
+051-sich-beziehen.webp
+052-biegen.webp
+053-bieten.webp
+054-binden.webp
+055-bitten.webp
+056-bleiben.webp
+057-braten.webp
+058-brechen.webp
+059-brennen.webp
+060-bringen.webp
+061-denken.webp
+062-dürfen.webp
+063-eindringen.webp
+064-einfallen.webp
+065-eingeben.webp
+066-einhalten.webp
+067-einladen.webp
+068-einschlafen.webp
+069-einschließen.webp
+070-einwerfen.webp
+071-einziehen.webp
+072-empfangen.webp
+073-empfehlen.webp
+074-empfinden.webp
+075-enthalten.webp
+076-entlassen.webp
+077-entnehmen.webp
+078-entscheiden.webp
+079-sich-entschließen.webp
+080-entsprechen.webp
+081-entstehen.webp
+082-entwerfen.webp
+083-erfahren.webp
+084-erfinden.webp
+085-sich-ergeben.webp
+086-ergreifen.webp
+087-erhalten.webp
+088-erkennen.webp
+089-erscheinen.webp
+090-ertragen.webp
+091-sich-erweisen.webp
+092-erwerben.webp
+093-erziehen.webp
+094-essen.webp
+095-fahren.webp
+096-fallen.webp
+097-fangen.webp
+098-fernsehen.webp
+099-feststehen.webp
+100-finden.webp
+101-fliegen.webp
+102-fliehen.webp
+103-fließen.webp
+104-fressen.webp
+105-frieren.webp
+106-geben.webp
+107-gefallen.webp
+108-gehen.webp
+109-gelingen.webp
+110-gelten.webp
+111-genießen.webp
+112-geraten.webp
+113-geschehen.webp
+114-gewinnen.webp
+115-gießen.webp
+116-greifen.webp
+117-haben.webp
+118-halten.webp
+119-hängen.webp
+120-heben.webp
+121-heißen.webp
+122-helfen.webp
+123-herunterladen.webp
+124-hervorheben.webp
+125-hinterlassen.webp
+126-hinweisen.webp
+127-hüpfen.webp
+128-kennen.webp
+129-klingen.webp
+130-kommen.webp
+131-können.webp
+132-laden.webp
+133-lassen.webp
+134-laufen.webp
+135-leiden.webp
+136-leihen.webp
+137-lesen.webp
+138-liegen.webp
+139-lügen.webp
+140-meiden.webp
+141-messen.webp
+142-missverstehen.webp
+143-mitbringen.webp
+144-mitnehmen.webp
+145-mögen.webp
+146-müssen.webp
+147-nachgeben.webp
+148-nachlassen.webp
+149-nachweisen.webp
+150-nehmen.webp
+151-nennen.webp
+152-raten.webp
+153-reiben.webp
+154-reiten.webp
+155-rennen.webp
+156-riechen.webp
+157-rufen.webp
+158-scheinen.webp
+159-schieben.webp
+160-schiefgehen.webp
+161-schießen.webp
+162-schlafen.webp
+163-schlagen.webp
+164-schleichen.webp
+165-schleifen.webp
+166-schließen.webp
+167-schmeißen.webp
+168-schneiden.webp
+169-schreiben.webp
+170-schreien.webp
+171-schweigen.webp
+172-schwimmen.webp
+173-sehen.webp
+174-sein.webp
+175-senden.webp
+176-singen.webp
+177-sinken.webp
+178-sitzen.webp
+179-sollen.webp
+180-spazieren-gehen.webp
+181-sprechen.webp
+182-springen.webp
+183-stattfinden.webp
+184-stechen.webp
+185-stehen.webp
+186-stehlen.webp
+187-steigen.webp
+188-sterben.webp
+189-stoßen.webp
+190-streichen.webp
+191-streiten.webp
+192-teilnehmen.webp
+193-tragen.webp
+194-treffen.webp
+195-treiben.webp
+196-treten.webp
+197-trinken.webp
+198-tun.webp
+199-überlassen.webp
+200-übernehmen.webp
+201-übertreffen.webp
+202-übertreiben.webp
+203-überweisen.webp
+204-überwinden.webp
+205-umfahren.webp
+206-umfahren.webp
+207-umfallen.webp
+208-umgeben.webp
+209-umsteigen.webp
+210-umziehen.webp
+211-unterbrechen.webp
+212-unterhalten.webp
+213-unterlassen.webp
+214-unternehmen.webp
+215-unterscheiden.webp
+216-unterschreiben.webp
+217-unterstreichen.webp
+218-verbergen.webp
+219-verbieten.webp
+220-verbinden.webp
+221-verbrennen.webp
+222-verbringen.webp
+223-vergeben.webp
+224-vergessen.webp
+225-vergleichen.webp
+226-sich-verhalten.webp
+227-verlassen.webp
+228-verlieren.webp
+229-vermeiden.webp
+230-verraten.webp
+231-verschieben.webp
+232-verschlafen.webp
+233-verschwinden.webp
+234-versprechen.webp
+235-verstehen.webp
+236-vertragen.webp
+237-vertreiben.webp
+238-vertreten.webp
+239-verzeihen.webp
+240-vorhaben.webp
+241-vorkommen.webp
+242-vorlesen.webp
+243-vorliegen.webp
+244-vorschlagen.webp
+245-vorschreiben.webp
+246-vortragen.webp
+247-vorweisen.webp
+248-wachsen.webp
+249-wahrnehmen.webp
+250-waschen.webp
+251-wegfallen.webp
+252-weglassen.webp
+253-weitergeben.webp
+254-weiterkommen.webp
+255-werben.webp
+256-werden.webp
+257-werfen.webp
+258-widerrufen.webp
+259-widersprechen.webp
+260-wiedergeben.webp
+261-wiedersehen.webp
+262-wiegen.webp
+263-wissen.webp
+264-wollen.webp
+265-ziehen.webp
+266-zugeben.webp
+267-zurechtfinden.webp
+268-zurücktreten.webp
+269-zusammentreffen.webp
+270-zwingen.webp
+```
