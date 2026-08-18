@@ -709,7 +709,7 @@ function renderDict(){
 }
 
 /* ---------- УЧИТЬ (карточки) ---------- */
-function verbImgPath(v){ return "verb-images/"+String(v.id).padStart(3,"0")+".webp"; }
+function verbImgPath(v){ return "verb-images/"+String(v.id).padStart(3,"0")+"-"+v.inf.replace(/\s+/g,"-")+".webp"; }
 function learnRange(){ return {from:parseInt(document.getElementById("rFromL").value,10), to:parseInt(document.getElementById("rToL").value,10)}; }
 function learnRangeValid(){ const {from,to}=learnRange(); return Number.isInteger(from)&&Number.isInteger(to)&&from>=1&&to<=MAXID&&from<=to; }
 function learnInRange(v){ const {from,to}=learnRange(); return v.id>=from && v.id<=to; }
