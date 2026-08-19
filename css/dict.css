@@ -1,0 +1,31 @@
+/* ---------- СЛОВАРЬ ---------- */
+.dsearch{width:100%; font:inherit; padding:11px 13px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--txt); margin-bottom:10px}
+.filterchips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:10px}
+.filterchips button{padding:6px 11px; font-size:12.5px; font-weight:600}
+.filterchips button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+.dtoggles{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:4px}
+.dcount{font-size:12.5px; color:var(--muted); margin:4px 0 2px}
+.dtable{border:1px solid var(--line); border-radius:12px; overflow:hidden}
+.drow{display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:10px; padding:11px 12px; border-bottom:1px solid var(--line); align-items:start}
+.drow:last-child{border-bottom:none}
+.drow:nth-child(even){background:var(--panel2)}
+.dinf{font-weight:800}
+.dinf .num{color:var(--muted); font-weight:700; margin-right:4px; font-size:13px}
+.dinf .hint{color:var(--muted); font-weight:600; font-size:12.5px}
+.dforms{font-size:11.5px; color:var(--muted); margin-top:2px}
+.dperf{font-weight:700}
+.dperf.ist{color:var(--accent2)} .dperf.hat{color:var(--txt)}
+.dtrans{}
+.dhead{display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:10px; padding:9px 12px; background:var(--panel2); border-bottom:1px solid var(--line); font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); font-weight:700; position:sticky; top:0}
+.dscroll{max-height:66vh; overflow:auto; border:1px solid var(--line); border-radius:12px}
+.dactions{display:flex; gap:4px}
+.dactions button{padding:3px 7px; font-size:12px; border-radius:8px}
+.dactions button.act{border-color:var(--accent2)}
+.masked{filter:blur(6px); cursor:pointer; user-select:none; transition:filter .1s}
+.masked:hover{filter:blur(3px)}
+.masked.revealed{filter:none; user-select:auto; cursor:default}
+.sdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:2px;vertical-align:middle}
+.sdot.learned{background:var(--ok)} .sdot.notlearned{background:var(--err)} .sdot.new{background:var(--accent2)} .sdot.repeated{background:var(--rep)}
+@media (max-width:560px){ .drow,.dhead{grid-template-columns:1fr 1fr; }
+  .dhead span:nth-child(3),.dhead span:nth-child(4){display:none}
+  .drow .dtrans{grid-column:1/2} .drow .dactions{grid-column:2/3; justify-self:end} }

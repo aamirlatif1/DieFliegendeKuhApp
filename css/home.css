@@ -1,0 +1,23 @@
+/* ---------- ГЛАВНАЯ (диапазон, папки, режимы) ---------- */
+.rangebar{display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:12px}
+.rangebar label{display:flex; align-items:center; gap:8px; font-weight:600}
+.rangebar input[type=number]{width:92px; font:inherit; font-size:17px; font-weight:700; text-align:center; padding:10px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--txt)}
+.rangebar input:focus{outline:none; border-color:var(--accent2)}
+.presets{display:flex; gap:7px; flex-wrap:wrap}
+.presets button{padding:6px 11px; font-size:12.5px; font-weight:600}
+.presets button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+.rwarn{margin-top:10px; color:var(--err); font-weight:600; font-size:13.5px}
+.folders{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:2px 0 4px}
+@media (max-width:520px){ .folders{grid-template-columns:repeat(2,1fr)} }
+.folder{background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px; text-align:center}
+.folder .n{font-size:26px; font-weight:800; line-height:1}
+.folder .l{font-size:12.5px; color:var(--muted); margin-top:6px}
+.folder.learned .n{color:var(--ok)} .folder.notlearned .n{color:var(--err)} .folder.new .n{color:var(--accent2)} .folder.repeated .n{color:var(--rep)}
+label.opt{display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; cursor:pointer; background:var(--panel2)}
+label.opt input{accent-color:var(--accent2)}
+.modes{display:flex; flex-direction:column; gap:8px; margin:6px 0 12px}
+.mode-row{display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid var(--line); border-radius:12px; cursor:pointer; background:var(--panel2)}
+.mode-row:hover{border-color:var(--accent2)}
+.mode-row.sel{border-color:var(--accent); background:linear-gradient(0deg,rgba(255,196,0,.06),rgba(255,196,0,.06))}
+.mode-row .t{font-weight:700} .mode-row .d{font-size:12.5px; color:var(--muted)}
+.mode-row .cnt{margin-left:auto; font-weight:800; color:var(--muted)}

@@ -1,0 +1,14 @@
+/* ---------- ТЕМА (переменные, тёмная + светлая) ---------- */
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+  --txt:#e8eaed; --muted:#9aa2b1; --accent:#ffc400; --accent2:#4f8cff;
+  --ok:#2fbf71; --okbg:#12331f; --err:#ff5a5a; --errbg:#3a1414;
+  --rep:#f0a202; --repbg:#3a2a0a;
+  --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f4f6fa; --panel:#ffffff; --panel2:#f0f2f7; --line:#e2e6ee;
+    --txt:#1a1d24; --muted:#5b6472; --accent:#e0a500; --accent2:#2f6bff;
+    --ok:#1f9d57; --okbg:#e4f6ec; --err:#d63333; --errbg:#fceaea;
+    --rep:#c97a00; --repbg:#fff0da; --shadow:0 10px 30px rgba(20,30,60,.10);}
+}

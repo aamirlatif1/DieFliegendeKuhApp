@@ -1,0 +1,22 @@
+/* ---------- КАРТОЧКИ (свайп в стиле Tinder) ---------- */
+.learncard-wrap{position:relative; max-width:420px; margin:0 auto; aspect-ratio:2/3; border-radius:20px; overflow:hidden; box-shadow:var(--shadow); background:var(--panel2); user-select:none; touch-action:none; cursor:grab}
+.learncard-wrap.dragging{cursor:grabbing}
+.learncard-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(22px); transform:scale(1.15); transition:filter .3s ease, transform .3s ease; background:var(--panel2)}
+.learncard-img.clear{filter:none; transform:scale(1)}
+.learncard-fallback{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:72px; background:linear-gradient(135deg,var(--panel2),var(--panel))}
+.learncard-overlay{position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.55) 100%); pointer-events:none; transition:opacity .2s}
+.learncard-overlay.clearstate{opacity:0}
+.tintL,.tintR{position:absolute; inset:0; pointer-events:none; opacity:0}
+.tintL{background:linear-gradient(90deg, rgba(255,90,90,.55), transparent 60%)}
+.tintR{background:linear-gradient(270deg, rgba(47,191,113,.55), transparent 60%)}
+.learncard-badge{position:absolute; top:14px; right:14px; font-size:26px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); transition:opacity .15s}
+.learncard-badge.hide2{opacity:0}
+.learncard-content{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:28px; text-align:center; color:#fff; transition:opacity .15s}
+.learncard-content.hide2{opacity:0}
+.learncard-inf{font-size:27px; font-weight:800; text-shadow:0 2px 6px rgba(0,0,0,.55)}
+.learncard-forms{font-size:14.5px; font-weight:600; opacity:.94; text-shadow:0 1px 4px rgba(0,0,0,.55)}
+.learncard-forms .perfline{margin-top:6px; font-weight:800; font-size:16px}
+.learncard-forms .perfline.hat{color:#fff} .learncard-forms .perfline.ist{color:#a9c9ff}
+.learncard-trans{font-size:23px; font-weight:700; text-shadow:0 2px 6px rgba(0,0,0,.55)}
+.learncard-example{position:absolute; left:0; right:0; bottom:0; padding:22px 22px 26px; background:linear-gradient(transparent, rgba(0,0,0,.82) 55%); color:#fff; font-family:"VT323",ui-monospace,"Courier New",monospace; font-size:26px; letter-spacing:.3px; line-height:1.35; text-align:center; opacity:0; pointer-events:none; transition:opacity .2s; text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.learncard-example.show2{opacity:1}

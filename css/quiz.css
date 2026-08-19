@@ -1,0 +1,28 @@
+/* ---------- ТЕСТ (вопрос, поля, разбор, итог) ---------- */
+.pbar{height:8px; background:var(--panel2); border-radius:8px; overflow:hidden; margin-bottom:8px}
+.pbar i{display:block; height:100%; background:var(--accent); width:0; transition:.3s}
+.qmeta{display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:14px}
+.verb{font-size:30px; font-weight:800; letter-spacing:.3px}
+.verb .hint{font-size:15px; color:var(--muted); font-weight:600; margin-left:8px}
+.field{margin-top:16px}
+.field label{display:block; font-size:12.5px; color:var(--muted); margin-bottom:6px; font-weight:600; text-transform:uppercase; letter-spacing:.5px}
+.field input{width:100%; font:inherit; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--txt); font-size:16px}
+.field input:focus{outline:none; border-color:var(--accent2)}
+.field input.good{border-color:var(--ok); background:var(--okbg)}
+.field input.bad{border-color:var(--err); background:var(--errbg)}
+.correct{margin-top:6px; font-size:13.5px}
+.correct .ok{color:var(--ok); font-weight:700} .correct .bad{color:var(--err); font-weight:700}
+.sol{font-weight:700}
+.override{display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap}
+.override .q{font-size:13px; color:var(--muted)}
+.chip{padding:5px 11px; border-radius:20px; font-size:12.5px; border:1px solid var(--line); background:var(--panel2); cursor:pointer}
+.chip.on-ok{background:var(--okbg); border-color:var(--ok); color:var(--ok)}
+.chip.on-bad{background:var(--errbg); border-color:var(--err); color:var(--err)}
+table{width:100%; border-collapse:collapse; font-size:14px; margin-top:6px}
+th,td{text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top}
+th{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.4px}
+td.you{color:var(--err)}
+.badge{display:inline-block; font-size:11px; padding:2px 7px; border-radius:6px; font-weight:700}
+.badge.s{background:rgba(47,191,113,.15); color:var(--ok)}
+.scorebig{font-size:44px; font-weight:900; text-align:center; margin:4px 0}
+.scoresub{text-align:center; color:var(--muted); margin-bottom:6px}

@@ -1,0 +1,26 @@
+/* ---------- БАЗА (сброс, шапка, навигация, кнопки) ---------- */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.5; padding:20px; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:760px; margin:0 auto;}
+header.top{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+.applogo{width:40px;height:40px;border-radius:10px;flex:0 0 auto;box-shadow:0 1px 3px rgba(0,0,0,.3);object-fit:cover}
+h1{font-size:19px; margin:0; font-weight:700; letter-spacing:.2px}
+h1 small{display:block; font-weight:500; color:var(--muted); font-size:12.5px; margin-top:2px}
+.langtoggle{display:flex; gap:4px; flex:0 0 auto}
+.langtoggle button{padding:6px 10px; font-size:12px; font-weight:700; border-radius:10px}
+.langtoggle button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+.nav{display:flex; gap:8px; margin-bottom:16px}
+.nav button{flex:1; font:inherit; font-weight:700; cursor:pointer; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--txt); transition:.15s}
+.nav button.sel{background:var(--accent); color:#1a1400; border-color:transparent}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; margin-bottom:16px;}
+.muted{color:var(--muted)}
+.row{display:flex; gap:10px; flex-wrap:wrap}
+button{font:inherit; cursor:pointer; border:1px solid var(--line); background:var(--panel2); color:var(--txt); padding:11px 16px; border-radius:12px; transition:.15s; font-weight:600;}
+button:hover{border-color:var(--accent2); transform:translateY(-1px)}
+button.primary{background:var(--accent); color:#1a1400; border-color:transparent}
+button.primary:hover{filter:brightness(1.05)}
+button.ghost{background:transparent}
+button:disabled{opacity:.45; cursor:not-allowed; transform:none; border-color:var(--line)}
+.cardtitle{font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:8px}
+.cardtitle .sub{font-weight:500; color:var(--muted); font-size:13px}
