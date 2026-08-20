@@ -21,7 +21,10 @@ document.getElementById("dictSearch").addEventListener("input",renderDict);
 document.getElementById("hideTrans").addEventListener("change",renderDict);
 document.getElementById("hidePerf").addEventListener("change",renderDict);
 document.querySelectorAll('#dictFilters button').forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll('#dictFilters button').forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); dictFilter=b.dataset.f; renderDict(); }));
-document.addEventListener("keydown",e=>{ if(document.getElementById("quizScreen").classList.contains("hide"))return; if(e.key==="Enter"){ e.preventDefault(); if(!document.getElementById("nextBtn").classList.contains("hide")) nextQuestion(); else doCheck(); } });
+document.addEventListener("keydown",e=>{ if(document.getElementById("quizScreen").classList.contains("hide"))return;
+  if(e.key==="Enter"){ e.preventDefault(); if(!document.getElementById("nextBtn").classList.contains("hide")) nextQuestion(); else doCheck(); }
+  /* 1–4 — выбор варианта; в поле ввода цифры остаются цифрами */
+  else if(/^[1-4]$/.test(e.key) && e.target.tagName!=="INPUT"){ e.preventDefault(); pickChoice(+e.key-1); } });
 document.querySelectorAll('#ovTrans .chip').forEach(b=>b.addEventListener("click",()=>{ if(!curEval)return; const val=b.dataset.val==="1"; curEval.okT=val; styleOverride(val);
   const it=document.getElementById("inTrans"); it.classList.remove("good","bad"); it.classList.add(val?"good":"bad");
   const vTrans = vTransOf(curEval.v);

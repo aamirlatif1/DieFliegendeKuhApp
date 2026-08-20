@@ -23,7 +23,7 @@ Work happens on short-lived feature branches merged into `main` with merge commi
 ```
 index.html        markup only — no inline CSS or JS
 css/              8 stylesheets, linked in <head>
-js/               10 modules + 3 label files, loaded at the end of <body>
+js/               11 modules + 3 label files, loaded at the end of <body>
 data/verbs.js     the 270-verb array
 data/prepverbs.js the 111 verb+preposition array
 verb-images/      card illustrations, NNN-infinitiv.webp
@@ -39,12 +39,12 @@ Eight `<link rel="stylesheet">` tags in `<head>`. **Link order is the cascade or
 | `css/fonts.css` | the VT323 `@font-face` (base64 WOFF2, ~24 KB — the bulk of the CSS) |
 | `css/base.css` | reset, `body`, `.wrap`, header, logo, language toggle, course toggle, nav tabs, `.card`, generic `button` |
 | `css/home.css` | range bar, presets, folder counters, `label.opt`, test-mode rows |
-| `css/quiz.css` | progress bar, question, masked-example line, input fields, Kasus/override chips, mistake table, score |
+| `css/quiz.css` | progress bar, question, masked-example line, input fields, Kasus/override chips, `.choices` answer options, mistake table, score |
 | `css/utils.css` | `.hide`, `.foot`, `.divider`, `input[type=file]`, `kbd` |
 | `css/dict.css` | dictionary search, filter chips, table grid, `hat`/`ist` and `akk`/`dat` colours, `.masked` self-check blur |
 | `css/cards.css` | flashcard, swipe tints, overlay/badge/example reveal states, `.prepline` |
 
-Fifteen `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
+Sixteen `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
 
 | File | Contents |
 | --- | --- |
@@ -57,6 +57,7 @@ Fifteen `<script src>` tags at the end of `<body>`. **Load order is load-bearing
 | `js/course.js` | `COURSES`, `course`, `ITEMS()`, `isPrep()`, `maskExample()`, `setCourse()` |
 | `js/state.js` | `MAXID`/`BYID`, progress load/save, range, presets, folder counts |
 | `js/check.js` | answer normalisation, `checkTrans()`, `checkPerf()`, `checkPrep()`, `checkSecond()`, `secondOf()` |
+| `js/choices.js` | multiple-choice distractors: `buildChoices()`, `prepDistractors()`, `perfDistractors()` |
 | `js/nav.js` | `SCREENS`, `NAV_OF`, `show()` |
 | `js/quiz.js` | test modes, quiz session, grading, results |
 | `js/dict.js` | dictionary screen |
@@ -75,6 +76,17 @@ Sections inside each file are still marked with `/* ---------- NAME ---------- *
 The trainer's second question field is the one place the courses genuinely differ: Perfekt in the verbs course, preposition + case in the prep course. `checkSecond()`/`secondOf()` in `js/check.js` dispatch on the course, so quiz, results, dictionary and cards all call those instead of touching `v.perf`. `setCourse()` rebuilds the index, re-applies the i18n strings, restores that course's saved range and re-renders the visible screen; it drops any in-flight quiz/deck (the toggle is hidden on those screens anyway).
 
 `maskExample(v)` blanks the preposition out of a prep verb's example sentence (`hängt vom Wetter ab` → `hängt ___ Wetter ab`), covering contracted and `da(r)-` forms via `PREP_FORMS`. That masked sentence is the quiz prompt's context line and the front of the flashcard — it is also what disambiguates the ~17 verbs that appear twice with different prepositions (`bestehen aus` / `bestehen auf`), so **every prep entry's example must contain its preposition**.
+
+### Answer modes (input / multiple choice)
+
+The «Как отвечать» radio pair on the trainer screen (`input[name="ansmode"]`, read once per test by `selectedAnsMode()` and stored on `session.ansMode`) decides how the **second** field is answered. The translation field is always typed — `choiceOn()` is `session.ansMode === "choice" && session.askP`, and when it is false the screen behaves exactly as before. Nothing about the mode is persisted, like the other test checkboxes.
+
+In choice mode `renderQuestion()` hides `#inPerf` and the Kasus chips and fills `#choiceList` with four `.choice` buttons (numbered 1–4, also selectable with those keys — the handler in `js/main.js` ignores digits typed inside an `<input>`). `doCheck()` bails out with `alertPickOption` if nothing is selected — before grading the translation, so the question stays re-answerable — then compares the picked string with `session.choices.correct` and paints the buttons via `markChoices()`. `curEval.ansP` holds the picked option, so the mistake table needs no special case.
+
+`js/choices.js` builds the four options; `buildChoices(v)` returns `{correct, options}` with `options` already shuffled.
+
+- **Prep course**: the three wrong options are other `prep + kasus` pairs drawn from the 17 that occur in `PREPVERBS`, so the same preposition with the other case (`an + A` vs `an + D`) can show up as a distractor.
+- **Verbs course**: the wrong options are *malformed Perfekt forms of the same verb*, never other verbs' forms — otherwise the answer would be readable off the stem. One distractor always keeps the right participle with the wrong auxiliary (`ist abgebrochen`), the rest mangle the participle: weak ending (`hat abgebrocht`), stem taken straight from the infinitive (`hat abgebrechen`), missing `ge-` (`hat abbrochen`). Auxiliaries are assigned so the correct one is not the odd one out. `gePrefix()` finds where `ge-` sits in the participle by matching the infinitive's separable prefix; verbs with no `ge-` in the participle (`verstanden`) fall back to infinitive-shaped forms (`hat versteht`, `hat verstehen`). Candidates are deduplicated through `normPerf()` and checked against **every** entry of `v.perf`, so a verb with two accepted forms can never see one of them offered as a wrong answer; `perfFallback()` tops up from other verbs if a verb yields fewer than three.
 
 ### Data model
 
@@ -122,7 +134,7 @@ Open `index.html` in a browser and exercise the affected tab by hand — **in bo
 - **Check the DevTools console and Network tab for 404s.** A mistyped `src`/`href`, or a new file never added to `index.html`, fails quietly: the page still renders, just without that rule or function. A missing `js/*.js` usually surfaces as a `ReferenceError` further down the chain rather than at the missing file itself.
 - **Adding a file means adding its tag** to `index.html`, in the right position — see the load-order and cascade-order notes above.
 
-For a fast regression sweep without a browser, jsdom loads the real `index.html` from disk with `runScripts: "dangerously", resources: "usable"` and executes all fifteen scripts and eight stylesheets. It is good for asserting that screens render, handlers fire, grading works, and that the parsed CSS rule list is unchanged after a refactor. It does no layout and does not implement `window.scrollTo` (harmless errors), so it cannot confirm anything visual. Note that `const` globals live in the global lexical environment, not on `window` — reach them with `window.eval("VERBS")`, not `window.VERBS`. It also serves the page from a `file://` URL, whose opaque origin makes `localStorage` throw — the app's try/catch swallows that, but a test that touches storage directly must not. Nothing like this is checked in: install it in a scratch directory outside the repo and keep the repo dependency-free.
+For a fast regression sweep without a browser, jsdom loads the real `index.html` from disk with `runScripts: "dangerously", resources: "usable"` and executes all sixteen scripts and eight stylesheets. It is good for asserting that screens render, handlers fire, grading works, and that the parsed CSS rule list is unchanged after a refactor. It does no layout and does not implement `window.scrollTo` (harmless errors), so it cannot confirm anything visual. Note that `const` globals live in the global lexical environment, not on `window` — reach them with `window.eval("VERBS")`, not `window.VERBS`. It also serves the page from a `file://` URL, whose opaque origin makes `localStorage` throw — the app's try/catch swallows that, but a test that touches storage directly must not. Nothing like this is checked in: install it in a scratch directory outside the repo and keep the repo dependency-free.
 
 ## verb-images/
 

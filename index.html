@@ -65,6 +65,11 @@
         <label class="opt"><input type="checkbox" id="chkTrans" checked> <span data-i18n="chkTransLbl">Спрашивать перевод</span></label>
         <label class="opt"><input type="checkbox" id="chkPerf" checked> <span data-i18n="chkPerfLbl">Спрашивать Perfekt</span></label>
       </div>
+      <div class="cardtitle" style="margin-top:14px"><span data-i18n="ansModeTitle">✍️ Как отвечать</span> <span class="sub" data-i18n="ansModeSub">Perfekt — ввод или выбор</span></div>
+      <div class="row">
+        <label class="opt"><input type="radio" name="ansmode" value="input" checked> <span data-i18n="ansModeInput">⌨️ Вводить с клавиатуры</span></label>
+        <label class="opt"><input type="radio" name="ansmode" value="choice"> <span data-i18n="ansModeChoice">🔘 Выбирать из 4 вариантов</span></label>
+      </div>
       <div class="divider"></div>
       <div class="row">
         <button class="primary" id="startBtn" data-i18n="startBtn">▶ Начать тест</button>
@@ -129,6 +134,7 @@
           <button type="button" class="chip" data-k="A" data-i18n="kasusA">Akkusativ (A)</button>
           <button type="button" class="chip" data-k="D" data-i18n="kasusD">Dativ (D)</button>
         </div>
+        <div class="choices hide" id="choiceList"></div>
         <div class="correct hide" id="corrPerf"></div>
       </div>
       <div class="divider"></div>
@@ -229,6 +235,7 @@
 <script src="js/course.js"></script>
 <script src="js/state.js"></script>
 <script src="js/check.js"></script>
+<script src="js/choices.js"></script>
 <script src="js/nav.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/dict.js"></script>

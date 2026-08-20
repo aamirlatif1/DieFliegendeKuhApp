@@ -13,6 +13,8 @@ function renderModes(){
     box.appendChild(row); });
 }
 function selectedMode(){ const r=document.querySelector(".mode-row.sel"); return r?r.dataset.mode:null; }
+/* Как отвечать на второй вопрос: ввод с клавиатуры или выбор из вариантов. */
+function selectedAnsMode(){ const r=document.querySelector('input[name="ansmode"]:checked'); return r?r.value:"input"; }
 
 /* ---------- ТЕСТ ---------- */
 let session=null, curEval=null;
@@ -32,7 +34,31 @@ function startQuiz(mode){
   if(!askT&&!askP){ alert(tc("alertChooseOne")); return; }
   const queue=buildQueue(mode);
   if(queue.length===0){ alert(t("alertEmptyPool")); return; }
-  session={queue,idx:0,results:[],askT,askP}; show("quiz"); renderQuestion();
+  session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null}; show("quiz"); renderQuestion();
+}
+/* Варианты показываются только вместо второго поля — перевод всегда вводится текстом. */
+function choiceOn(){ return !!session && session.ansMode==="choice" && session.askP; }
+function renderChoices(v){
+  const box=document.getElementById("choiceList"); box.innerHTML="";
+  session.choices=buildChoices(v); session.pick=null;
+  session.choices.options.forEach((o,i)=>{
+    const b=document.createElement("button"); b.type="button"; b.className="choice"; b.dataset.val=o;
+    const k=document.createElement("span"); k.className="k"; k.textContent=i+1;
+    const val=document.createElement("span"); val.textContent=o;
+    b.appendChild(k); b.appendChild(val);
+    b.addEventListener("click",()=>pickChoice(i));
+    box.appendChild(b); });
+}
+function pickChoice(i){
+  if(!choiceOn()||!session.choices) return;
+  const bs=document.querySelectorAll("#choiceList .choice");
+  if(!bs[i]||bs[i].disabled) return;
+  bs.forEach(b=>b.classList.remove("sel")); bs[i].classList.add("sel"); session.pick=bs[i].dataset.val;
+}
+function markChoices(){
+  const right=session.choices.correct;
+  document.querySelectorAll("#choiceList .choice").forEach(b=>{ b.disabled=true; b.classList.remove("sel");
+    if(b.dataset.val===right) b.classList.add("good"); else if(b.dataset.val===session.pick) b.classList.add("bad"); });
 }
 function renderQuestion(){
   const v=session.queue[session.idx], total=session.queue.length;
@@ -48,22 +74,30 @@ function renderQuestion(){
   const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf");
   it.value="";ip.value="";it.className="";ip.className="";it.disabled=false;ip.disabled=false;
   clearKasus();
+  const ch=choiceOn(), cl=document.getElementById("choiceList");
+  ip.classList.toggle("hide",ch);
+  document.getElementById("kasusPick").classList.toggle("hide",!isPrep()||ch);
+  cl.classList.toggle("hide",!ch);
+  if(ch) renderChoices(v); else { cl.innerHTML=""; session.choices=null; session.pick=null; }
   document.getElementById("corrTrans").classList.add("hide"); document.getElementById("corrPerf").classList.add("hide"); document.getElementById("ovTrans").classList.add("hide");
   document.getElementById("checkBtn").classList.remove("hide"); document.getElementById("nextBtn").classList.add("hide");
-  setTimeout(()=>{(session.askT?it:ip).focus();},50);
+  setTimeout(()=>{ if(session.askT) it.focus(); else if(!ch) ip.focus(); },50);
 }
 function doCheck(){
+  if(choiceOn() && session.pick===null){ alert(t("alertPickOption")); return; }
   const v=session.queue[session.idx]; const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf"); let okT=true, okP=true;
-  const vTrans = vTransOf(v);
+  const vTrans = vTransOf(v); let ansP = ip.value;
   if(session.askT){ okT=checkTrans(v,it.value); it.disabled=true; it.classList.add(okT?"good":"bad");
     const ct=document.getElementById("corrTrans"); ct.classList.remove("hide");
     ct.innerHTML=okT?`<span class="ok">${t("correctYes")}</span> ${t("valueLbl")} <span class="sol">${vTrans}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${vTrans}</span>`;
     document.getElementById("ovTrans").classList.remove("hide"); styleOverride(okT); }
-  if(session.askP){ okP=checkSecond(v,ip.value,selectedKasus()); ip.disabled=true; ip.classList.add(okP?"good":"bad");
+  if(session.askP){
+    if(choiceOn()){ ansP=session.pick; okP=(ansP===session.choices.correct); markChoices(); }
+    else { okP=checkSecond(v,ip.value,selectedKasus()); ip.disabled=true; ip.classList.add(okP?"good":"bad"); }
     const sol=secondOf(v);
     const cp=document.getElementById("corrPerf"); cp.classList.remove("hide");
     cp.innerHTML=okP?`<span class="ok">${t("correctYes")}</span> <span class="sol">${sol}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${sol}</span>`; }
-  curEval={okT,okP,v,ansT:it.value,ansP:ip.value};
+  curEval={okT,okP,v,ansT:it.value,ansP};
   document.getElementById("checkBtn").classList.add("hide"); document.getElementById("nextBtn").classList.remove("hide"); document.getElementById("nextBtn").focus();
 }
 function selectedKasus(){ const b=document.querySelector("#kasusPick button.sel"); return b?b.dataset.k:""; }
@@ -97,4 +131,4 @@ function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&
 function retryWrong(){ const ids=(session&&session._wrongIds)||[]; if(ids.length===0){ alert(t("alertNoWrong")); return; }
   const askT=document.getElementById("chkTrans").checked, askP=document.getElementById("chkPerf").checked; let queue=ids.map(id=>BYID[id]);
   if(document.getElementById("chkShuffle").checked){ for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]];} }
-  session={queue,idx:0,results:[],askT,askP}; show("quiz"); renderQuestion(); }
+  session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null}; show("quiz"); renderQuestion(); }
