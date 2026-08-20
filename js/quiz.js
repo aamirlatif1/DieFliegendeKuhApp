@@ -4,7 +4,7 @@
 function renderModes(){
   const c=counts();
   const cnts=[c.learned+c.notlearned+c.repeated+c["new"], c["new"]+c.notlearned+c.repeated, c.notlearned, c.repeated, c.learned];
-  const modes=I18N[lang].modes.map((m,i)=>({...m, cnt:cnts[i]}));
+  const modes=t("modes").map((m,i)=>({...m, cnt:cnts[i]}));
   const box=document.getElementById("modeList"); const prev=selectedMode(); box.innerHTML="";
   modes.forEach((m,i)=>{ const sel=(prev? m.k===prev : i===0); const row=document.createElement("div");
     row.className="mode-row"+(sel?" sel":""); row.dataset.mode=m.k;

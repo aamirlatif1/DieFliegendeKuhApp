@@ -1,225 +1,52 @@
 "use strict";
 
-/* ---------- I18N ---------- */
+/* ---------- РЕЕСТР ЯЗЫКОВ ---------- */
+/* Строки каждого языка лежат в отдельном файле js/labels_<код>.js, который сам себя
+   регистрирует через registerLang(). Чтобы добавить язык: скопировать любой labels_*.js,
+   перевести строки, добавить <script src> в index.html — больше ничего править не нужно.
+   Порядок тегов = порядок кнопок в переключателе языка. */
 const LANG_KEY = "deutsch_verben_1_270_lang";
-let lang = "ru";
-try{ lang = localStorage.getItem(LANG_KEY) || "ru"; }catch(e){}
-if(!["ru","en","it"].includes(lang)) lang = "ru";
-const I18N = {
-  ru:{
-    pageTitle:"DieFliegendeKuh · Unregelmäßige Verben 1–270 · Тренажёр, словарь и карточки",
-    pageTitle_prep:"DieFliegendeKuh · Verben mit Präpositionen · Тренажёр, словарь и карточки",
-    subtitle:"Unregelmäßige Verben",
-    subtitle_prep:"Verben mit Präpositionen",
-    courseVerbs:"🔤 Формы глаголов", coursePrep:"🔗 Глаголы с предлогами",
-    navHome:"🎯 Тренажёр", navDict:"📖 Словарь", navLearn:"🗂️ Карточки",
-    rangeTitle:"📍 Диапазон глаголов",
-    lblFrom:"от", lblTo:"до",
-    lblLearned:"📗 Выучено", lblNotLearned:"📕 Невыучено", lblNew:"📘 Новые", lblRepeated:"🟡 Повторено",
-    whatTrainTitle:"🎯 Что тренируем", whatTrainSub:"в выбранном диапазоне",
-    chkShuffleLbl:"Перемешать", chkTransLbl:"Спрашивать перевод", chkPerfLbl:"Спрашивать Perfekt",
-    chkPerfLbl_prep:"Спрашивать предлог",
-    startBtn:"▶ Начать тест", dictShortcut:"📖 Открыть словарь",
-    exportBtn:"⬇ Экспорт", importBtn:"⬆ Импорт", resetBtn:"↺ Сброс",
-    autosaveFoot:"Прогресс автосохраняется в этом браузере. «Экспорт» скачивает файл прогресса с датой и временем в названии.",
-    dictTitle:"📖 Словарь глаголов", dictSearchPh:"Поиск: инфинитив, перевод или номер…",
-    dictTitle_prep:"📖 Глаголы с предлогами", dictSearchPh_prep:"Поиск: глагол, предлог, перевод или номер…",
-    filterAll:(n)=>"Все "+n, filterRange:"В диапазоне",
-    hideTransLbl:"Скрыть перевод", hidePerfLbl:"Скрыть Perfekt", hidePerfLbl_prep:"Скрыть предлог",
-    selfCheckFoot:"Режим самопроверки: включи «скрыть» и нажимай на ячейку, чтобы открыть ответ.",
-    dheadVerb:"Глагол · Präs · Prät", dheadVerb_prep:"Глагол · пример",
-    dheadPerfekt:"Perfekt", dheadPerfekt_prep:"Предлог + падеж", dheadTrans:"Перевод", dheadFolder:"Папка",
-    transFieldLbl:"Перевод (на русский)", transFieldPh:"напр. прерывать",
-    perfFieldLbl:"Perfekt (со вспомог. глаголом)", perfFieldPh:"напр. hat abgebrochen",
-    perfFieldLbl_prep:"Предлог + падеж", perfFieldPh_prep:"напр. über",
-    kasusA:"Akkusativ (A)", kasusD:"Dativ (D)",
-    overrideQ:"Засчитать перевод?", chipCorrect:"✓ Верно", chipWrong:"✗ Ошибка",
-    checkBtn:"Проверить", nextBtn:"Дальше →", quitBtn:"Завершить", enterHint:"проверить / дальше",
-    errCardTitle:"Разбор ошибок",
-    retryWrongBtn:"↻ Повторить ошибки этого теста", againBtn:"🏠 На главную",
-    footerCredit:"Собрано kiselkath",
-    presetAll:(n)=>"Все 1–"+n,
-    rangeWarn:(max)=>`Укажите корректный диапазон: числа от 1 до ${max}, «от» ≤ «до».`,
-    inDiap:(from,to)=>`в диапазоне ${from}–${to}`,
-    savedInfo:(d)=>{ try{ return "💾 Прогресс сохранён · "+d.toLocaleString('ru-RU'); }catch(e){ return ""; } },
-    saveUnavailable:"⚠ Автосохранение недоступно — используйте «Экспорт».",
-    modes:[
-      {k:"all",t:"Весь диапазон",d:"Все глаголы выбранного интервала"},
-      {k:"new",t:"Новые + невыученные + повторённые",d:"Всё, что ещё не в «Выучено»"},
-      {k:"notlearned",t:"Только невыученные",d:"Работа над ошибками"},
-      {k:"repeated",t:"Только повторённые",d:"Подтвердить самооценку «вроде помню»"},
-      {k:"learned",t:"Только выученные",d:"Проверить, что не забылось"},
-    ],
-    alertNoRange:"Сначала укажите корректный диапазон глаголов.",
-    alertChooseOne:"Выберите хотя бы одно: перевод или Perfekt.",
-    alertChooseOne_prep:"Выберите хотя бы одно: перевод или предлог.",
-    alertChooseStatus:"Выберите хотя бы один статус.",
-    alertEmptyPool:"В этой папке/диапазоне нет глаголов для теста.",
-    alertNoWrong:"В этом тесте не было ошибок.",
-    alertImported:(n)=>"Импортировано глаголов: "+n,
-    alertImportFail:"Не удалось прочитать файл прогресса.",
-    confirmReset:(n)=>`Сбросить прогресс этого курса (все ${n} глаголов станут «новыми»)?`,
-    qpos:(i,total,id)=>`Глагол ${i} из ${total} · №${id}`,
-    correctYes:"✓ Верно.", correctNo:"✗ Ошибка.", acceptedYes:"✓ Засчитано.",
-    valueLbl:"Значение:", correctLbl:"Правильно:",
-    verdictPerfect:"Идеально! 🎉", verdictGreat:"Отличный результат",
-    verdictOk:"Неплохо, но есть над чем поработать", verdictBad:"Нужно ещё повторить",
-    noErrors:"Ошибок нет — все глаголы отправлены в папку «Выучено». 🎉",
-    errIntro:(wrong,total)=>`Ошибок: <b>${wrong}</b> из ${total}. Эти глаголы теперь в папке 📕 «Невыучено».`,
-    badgeCorrect:"верно", thVerb:"Глагол", thTrans:"Перевод", thPerf:"Perfekt", thPerf_prep:"Предлог",
-    dictAllForms:"все формы для повторения", dictAllForms_prep:"все предлоги для повторения", dictEmpty:"Ничего не найдено.",
-    actLearned:"Выучено", actNotLearned:"Невыучено", actNew:"Новое", actRepeated:"Повторено",
-    verbWord:(n)=>{ const f=["глагол","глагола","глаголов"]; const a=n%10,b=n%100; if(a===1&&b!==11)return f[0]; if(a>=2&&a<=4&&(b<10||b>=20))return f[1]; return f[2]; },
-    learnFilterTitle:"🗂️ Фильтр по статусу", learnStartBtn:"▶ Начать",
-    learnFinishBtn:"🏁 Завершить / выбрать другой набор",
-    learnSetupFoot:"Диапазон и фильтр запоминаются, пока открыта эта страница.",
-    learnTapHint:"Тап по карточке — рассмотреть · свайп — следующая карточка",
-    learnTapHint_prep:"Тап — предлог и перевод · ещё тап — пример · свайп — следующая карточка",
-  },
-  en:{
-    pageTitle:"DieFliegendeKuh · Unregelmäßige Verben 1–270 · Trainer, Dictionary & Flashcards",
-    pageTitle_prep:"DieFliegendeKuh · Verben mit Präpositionen · Trainer, Dictionary & Flashcards",
-    subtitle:"Unregelmäßige Verben",
-    subtitle_prep:"Verben mit Präpositionen",
-    courseVerbs:"🔤 Verb forms", coursePrep:"🔗 Verbs + prepositions",
-    navHome:"🎯 Trainer", navDict:"📖 Dictionary", navLearn:"🗂️ Cards",
-    rangeTitle:"📍 Verb range",
-    lblFrom:"from", lblTo:"to",
-    lblLearned:"📗 Learned", lblNotLearned:"📕 Not learned", lblNew:"📘 New", lblRepeated:"🟡 Repeated",
-    whatTrainTitle:"🎯 What to practice", whatTrainSub:"in the selected range",
-    chkShuffleLbl:"Shuffle", chkTransLbl:"Ask translation", chkPerfLbl:"Ask Perfekt",
-    chkPerfLbl_prep:"Ask preposition",
-    startBtn:"▶ Start test", dictShortcut:"📖 Open dictionary",
-    exportBtn:"⬇ Export", importBtn:"⬆ Import", resetBtn:"↺ Reset",
-    autosaveFoot:"Progress is auto-saved in this browser. “Export” downloads a progress file with the date and time in its name.",
-    dictTitle:"📖 Verb dictionary", dictSearchPh:"Search: infinitive, translation or number…",
-    dictTitle_prep:"📖 Verbs with prepositions", dictSearchPh_prep:"Search: verb, preposition, translation or number…",
-    filterAll:(n)=>"All "+n, filterRange:"In range",
-    hideTransLbl:"Hide translation", hidePerfLbl:"Hide Perfekt", hidePerfLbl_prep:"Hide preposition",
-    selfCheckFoot:"Self-check mode: turn on “hide” and click a cell to reveal the answer.",
-    dheadVerb:"Verb · Präs · Prät", dheadVerb_prep:"Verb · example",
-    dheadPerfekt:"Perfekt", dheadPerfekt_prep:"Preposition + case", dheadTrans:"Translation", dheadFolder:"Folder",
-    transFieldLbl:"Translation (to English)", transFieldPh:"e.g. interrupt",
-    perfFieldLbl:"Perfekt (with auxiliary verb)", perfFieldPh:"e.g. hat abgebrochen",
-    perfFieldLbl_prep:"Preposition + case", perfFieldPh_prep:"e.g. über",
-    kasusA:"Akkusativ (A)", kasusD:"Dativ (D)",
-    overrideQ:"Accept this translation?", chipCorrect:"✓ Correct", chipWrong:"✗ Wrong",
-    checkBtn:"Check", nextBtn:"Next →", quitBtn:"Finish", enterHint:"check / next",
-    errCardTitle:"Mistake review",
-    retryWrongBtn:"↻ Retry this test's mistakes", againBtn:"🏠 Home",
-    footerCredit:"Made by kiselkath",
-    presetAll:(n)=>"All 1–"+n,
-    rangeWarn:(max)=>`Please enter a valid range: numbers from 1 to ${max}, “from” ≤ “to”.`,
-    inDiap:(from,to)=>`in range ${from}–${to}`,
-    savedInfo:(d)=>{ try{ return "💾 Progress saved · "+d.toLocaleString('en-US'); }catch(e){ return ""; } },
-    saveUnavailable:"⚠ Auto-save unavailable — use “Export”.",
-    modes:[
-      {k:"all",t:"Whole range",d:"All verbs in the selected range"},
-      {k:"new",t:"New + not learned + repeated",d:"Everything not yet in “Learned”"},
-      {k:"notlearned",t:"Not learned only",d:"Work on mistakes"},
-      {k:"repeated",t:"Repeated only",d:"Confirm the “I think I remember” self-check"},
-      {k:"learned",t:"Learned only",d:"Check what's retained"},
-    ],
-    alertNoRange:"Please enter a valid verb range first.",
-    alertChooseOne:"Choose at least one: translation or Perfekt.",
-    alertChooseOne_prep:"Choose at least one: translation or preposition.",
-    alertChooseStatus:"Choose at least one status.",
-    alertEmptyPool:"There are no verbs for this test in this folder/range.",
-    alertNoWrong:"There were no mistakes in this test.",
-    alertImported:(n)=>"Verbs imported: "+n,
-    alertImportFail:"Could not read the progress file.",
-    confirmReset:(n)=>`Reset this course's progress (all ${n} verbs will become “new”)?`,
-    qpos:(i,total,id)=>`Verb ${i} of ${total} · #${id}`,
-    correctYes:"✓ Correct.", correctNo:"✗ Wrong.", acceptedYes:"✓ Accepted.",
-    valueLbl:"Meaning:", correctLbl:"Correct answer:",
-    verdictPerfect:"Perfect! 🎉", verdictGreat:"Great result",
-    verdictOk:"Not bad, but there's room to improve", verdictBad:"Needs more practice",
-    noErrors:"No mistakes — all verbs moved to the “Learned” folder. 🎉",
-    errIntro:(wrong,total)=>`Mistakes: <b>${wrong}</b> of ${total}. These verbs are now in the 📕 “Not learned” folder.`,
-    badgeCorrect:"correct", thVerb:"Verb", thTrans:"Translation", thPerf:"Perfekt", thPerf_prep:"Preposition",
-    dictAllForms:"all forms for review", dictAllForms_prep:"all prepositions for review", dictEmpty:"Nothing found.",
-    actLearned:"Learned", actNotLearned:"Not learned", actNew:"New", actRepeated:"Repeated",
-    verbWord:(n)=> n===1 ? "verb" : "verbs",
-    learnFilterTitle:"🗂️ Status filter", learnStartBtn:"▶ Start",
-    learnFinishBtn:"🏁 Finish / choose another set",
-    learnSetupFoot:"The range and filter are remembered while this page stays open.",
-    learnTapHint:"Tap the card to reveal more · swipe for the next card",
-    learnTapHint_prep:"Tap — preposition and meaning · tap again — example · swipe for the next card",
-  },
-  it:{
-    pageTitle:"DieFliegendeKuh · Unregelmäßige Verben 1–270 · Esercitatore, dizionario e schede",
-    pageTitle_prep:"DieFliegendeKuh · Verben mit Präpositionen · Esercitatore, dizionario e schede",
-    subtitle:"Unregelmäßige Verben",
-    subtitle_prep:"Verben mit Präpositionen",
-    courseVerbs:"🔤 Forme dei verbi", coursePrep:"🔗 Verbi con preposizioni",
-    navHome:"🎯 Esercitatore", navDict:"📖 Dizionario", navLearn:"🗂️ Schede",
-    rangeTitle:"📍 Intervallo di verbi",
-    lblFrom:"da", lblTo:"a",
-    lblLearned:"📗 Imparato", lblNotLearned:"📕 Non imparato", lblNew:"📘 Nuovo", lblRepeated:"🟡 Ripassato",
-    whatTrainTitle:"🎯 Cosa esercitare", whatTrainSub:"nell'intervallo selezionato",
-    chkShuffleLbl:"Mescola", chkTransLbl:"Chiedi la traduzione", chkPerfLbl:"Chiedi il Perfekt",
-    chkPerfLbl_prep:"Chiedi la preposizione",
-    startBtn:"▶ Inizia il test", dictShortcut:"📖 Apri il dizionario",
-    exportBtn:"⬇ Esporta", importBtn:"⬆ Importa", resetBtn:"↺ Reimposta",
-    autosaveFoot:"Il progresso viene salvato automaticamente in questo browser. «Esporta» scarica un file con data e ora nel nome.",
-    dictTitle:"📖 Dizionario dei verbi", dictSearchPh:"Cerca: infinito, traduzione o numero…",
-    dictTitle_prep:"📖 Verbi con preposizioni", dictSearchPh_prep:"Cerca: verbo, preposizione, traduzione o numero…",
-    filterAll:(n)=>"Tutti i "+n, filterRange:"Nell'intervallo",
-    hideTransLbl:"Nascondi traduzione", hidePerfLbl:"Nascondi Perfekt", hidePerfLbl_prep:"Nascondi preposizione",
-    selfCheckFoot:"Modalità autoverifica: attiva «nascondi» e clicca su una cella per rivelare la risposta.",
-    dheadVerb:"Verbo · Präs · Prät", dheadVerb_prep:"Verbo · esempio",
-    dheadPerfekt:"Perfekt", dheadPerfekt_prep:"Preposizione + caso", dheadTrans:"Traduzione", dheadFolder:"Cartella",
-    transFieldLbl:"Traduzione (in italiano)", transFieldPh:"es. interrompere",
-    perfFieldLbl:"Perfekt (con verbo ausiliare)", perfFieldPh:"es. hat abgebrochen",
-    perfFieldLbl_prep:"Preposizione + caso", perfFieldPh_prep:"es. über",
-    kasusA:"Akkusativ (A)", kasusD:"Dativ (D)",
-    overrideQ:"Considerare corretta la traduzione?", chipCorrect:"✓ Corretto", chipWrong:"✗ Errore",
-    checkBtn:"Verifica", nextBtn:"Avanti →", quitBtn:"Termina", enterHint:"verifica / avanti",
-    errCardTitle:"Analisi degli errori",
-    retryWrongBtn:"↻ Ripeti gli errori di questo test", againBtn:"🏠 Home",
-    footerCredit:"Creato da kiselkath",
-    presetAll:(n)=>"Tutti 1–"+n,
-    rangeWarn:(max)=>`Inserisci un intervallo valido: numeri da 1 a ${max}, «da» ≤ «a».`,
-    inDiap:(from,to)=>`nell'intervallo ${from}–${to}`,
-    savedInfo:(d)=>{ try{ return "💾 Progresso salvato · "+d.toLocaleString('it-IT'); }catch(e){ return ""; } },
-    saveUnavailable:"⚠ Salvataggio automatico non disponibile — usa «Esporta».",
-    modes:[
-      {k:"all",t:"Tutto l'intervallo",d:"Tutti i verbi dell'intervallo selezionato"},
-      {k:"new",t:"Nuovi + non imparati + ripassati",d:"Tutto ciò che non è ancora «Imparato»"},
-      {k:"notlearned",t:"Solo non imparati",d:"Lavora sugli errori"},
-      {k:"repeated",t:"Solo ripassati",d:"Conferma l'autovalutazione «mi sembra di ricordarlo»"},
-      {k:"learned",t:"Solo imparati",d:"Verifica cosa non hai dimenticato"},
-    ],
-    alertNoRange:"Indica prima un intervallo di verbi valido.",
-    alertChooseOne:"Scegli almeno una opzione: traduzione o Perfekt.",
-    alertChooseOne_prep:"Scegli almeno una opzione: traduzione o preposizione.",
-    alertChooseStatus:"Scegli almeno uno stato.",
-    alertEmptyPool:"Non ci sono verbi per questo test in questa cartella/intervallo.",
-    alertNoWrong:"Non ci sono stati errori in questo test.",
-    alertImported:(n)=>"Verbi importati: "+n,
-    alertImportFail:"Impossibile leggere il file di progresso.",
-    confirmReset:(n)=>`Reimpostare il progresso di questo corso (tutti i ${n} verbi diventeranno «nuovi»)?`,
-    qpos:(i,total,id)=>`Verbo ${i} di ${total} · №${id}`,
-    correctYes:"✓ Corretto.", correctNo:"✗ Errore.", acceptedYes:"✓ Accettato.",
-    valueLbl:"Significato:", correctLbl:"Risposta corretta:",
-    verdictPerfect:"Perfetto! 🎉", verdictGreat:"Ottimo risultato",
-    verdictOk:"Non male, ma c'è ancora da lavorare", verdictBad:"Serve altro ripasso",
-    noErrors:"Nessun errore — tutti i verbi sono nella cartella «Imparato». 🎉",
-    errIntro:(wrong,total)=>`Errori: <b>${wrong}</b> su ${total}. Questi verbi sono ora nella cartella 📕 «Non imparato».`,
-    badgeCorrect:"corretto", thVerb:"Verbo", thTrans:"Traduzione", thPerf:"Perfekt", thPerf_prep:"Preposizione",
-    dictAllForms:"tutte le forme per il ripasso", dictAllForms_prep:"tutte le preposizioni per il ripasso", dictEmpty:"Nessun risultato.",
-    actLearned:"Imparato", actNotLearned:"Non imparato", actNew:"Nuovo", actRepeated:"Ripassato",
-    verbWord:(n)=> n===1 ? "verbo" : "verbi",
-    learnFilterTitle:"🗂️ Filtro per stato", learnStartBtn:"▶ Inizia",
-    learnFinishBtn:"🏁 Termina / scegli un altro set",
-    learnSetupFoot:"L'intervallo e il filtro vengono memorizzati finché questa pagina resta aperta.",
-    learnTapHint:"Tocca la carta per vedere di più · scorri per la carta successiva",
-    learnTapHint_prep:"Tocca — preposizione e significato · ancora — esempio · scorri per la carta successiva",
-  }
-};
-function t(key){ return I18N[lang][key]; }
+const DEFAULT_LANG = "ru";
+const LANGS = {};        /* код → {code, name, transField, tKeysField, strings} */
+const LANG_ORDER = [];   /* коды в порядке регистрации */
+let lang = DEFAULT_LANG;
+
+/* meta: {name, transField, tKeysField} — подпись кнопки и поля перевода в данных. */
+function registerLang(code, meta, strings){
+  if(!LANGS[code]) LANG_ORDER.push(code);
+  LANGS[code] = Object.assign({code:code, strings:strings}, meta);
+}
+function langMeta(){ return LANGS[lang] || LANGS[DEFAULT_LANG]; }
+
+/* ---------- ВЫБОР ЯЗЫКА ---------- */
+function initLang(){
+  let saved = null;
+  try{ saved = localStorage.getItem(LANG_KEY); }catch(e){}
+  lang = LANGS[saved] ? saved : (LANGS[DEFAULT_LANG] ? DEFAULT_LANG : LANG_ORDER[0]);
+  renderLangToggle();
+}
+/* Кнопки строятся из реестра, поэтому новый язык появляется в шапке сам. */
+function renderLangToggle(){
+  const box = document.getElementById("langToggle"); if(!box) return;
+  box.innerHTML = "";
+  LANG_ORDER.forEach(code=>{ const b=document.createElement("button");
+    b.type="button"; b.dataset.lang=code; b.textContent=LANGS[code].name; box.appendChild(b); });
+}
+
+/* ---------- СТРОКИ ---------- */
+/* Недостающий ключ берётся из языка по умолчанию — новый перевод можно вести постепенно. */
+function rawStr(l, key){ const L = LANGS[l]; return L ? L.strings[key] : undefined; }
+function t(key){ const v = rawStr(lang, key); return v!==undefined ? v : rawStr(DEFAULT_LANG, key); }
 /* Строка с учётом курса: в курсе предлогов сначала ищется вариант «ключ_prep». */
-function tc(key){ const alt=key+"_prep"; return (isPrep() && I18N[lang][alt]!==undefined) ? I18N[lang][alt] : I18N[lang][key]; }
+function tc(key){
+  const alt = key+"_prep";
+  if(isPrep()){
+    const v = rawStr(lang, alt); if(v!==undefined) return v;
+    /* в текущем языке нет ни варианта, ни базового ключа — берём вариант из языка по умолчанию */
+    if(rawStr(lang, key)===undefined){ const f = rawStr(DEFAULT_LANG, alt); if(f!==undefined) return f; }
+  }
+  return t(key);
+}
 function tcText(key){ const v=tc(key); return typeof v==="function" ? v(MAXID) : v; }
 function applyStaticI18n(){
   document.documentElement.lang = lang;
@@ -230,7 +57,7 @@ function applyStaticI18n(){
 }
 let lastSavedAt = null;
 function setLang(l){
-  if(lang===l) return;
+  if(lang===l || !LANGS[l]) return;
   lang = l; try{ localStorage.setItem(LANG_KEY, l); }catch(e){}
   applyStaticI18n();
   renderPresets(); onRangeChange();
