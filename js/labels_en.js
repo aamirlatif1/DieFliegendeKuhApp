@@ -1,7 +1,7 @@
 "use strict";
 
 /* ---------- АНГЛИЙСКИЙ ---------- */
-registerLang("en", { name:"ENG", transField:"transEn", tKeysField:"tKeysEn" }, {
+registerLang("en", { name:"ENG" }, {
   pageTitle:"DieFliegendeKuh · Unregelmäßige Verben 1–270 · Trainer, Dictionary & Flashcards",
   pageTitle_prep:"DieFliegendeKuh · Verben mit Präpositionen · Trainer, Dictionary & Flashcards",
   subtitle:"Unregelmäßige Verben",

@@ -6,14 +6,13 @@ function normPerf(s){ return foldDe((s||"").toLowerCase()).replace(/[.,;!]/g," "
 function normRu(s){ return (s||"").toLowerCase().replace(/ё/g,"е")
   .replace(/[àáâã]/g,"a").replace(/[èéêë]/g,"e").replace(/[ìíîï]/g,"i").replace(/[òóôõ]/g,"o").replace(/[ùúûü]/g,"u").replace(/ç/g,"c")
   .replace(/[.,;!?()'’]/g," ").replace(/\s+/g," ").trim(); }
-/* Поля перевода объявлены в js/labels_<код>.js — см. langMeta(). */
+/* Перевод и его основы берутся из реестра переводов — см. js/translations.js. */
 function checkPerf(v,ans){ const a=normPerf(ans); if(!a)return false; for(const p of v.perf){ if(a===normPerf(p))return true; } return false; }
 function checkTrans(v,ans){ const a=normRu(ans); if(!a)return false;
-  const keys = v[langMeta().tKeysField];
+  const keys = tKeysOf(v);
   for(const k of keys){ const kk=normRu(k); if(kk===a) return true;
     if(kk.length>=3 && a.includes(kk)) return true;
     const words=a.split(" ").filter(w=>w.length>=4); for(const w of words){ if(kk.includes(w)) return true; } } return false; }
-function vTransOf(v){ return v[langMeta().transField]; }
 
 /* ---------- ПРЕДЛОГ + ПАДЕЖ ---------- */
 /* Падеж можно выбрать кнопкой или дописать словом: «über + A», «ueber akk», «über accusativo». */

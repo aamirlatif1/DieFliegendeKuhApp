@@ -7,16 +7,16 @@
    Порядок тегов = порядок кнопок в переключателе языка. */
 const LANG_KEY = "deutsch_verben_1_270_lang";
 const DEFAULT_LANG = "ru";
-const LANGS = {};        /* код → {code, name, transField, tKeysField, strings} */
+const LANGS = {};        /* код → {code, name, strings} */
 const LANG_ORDER = [];   /* коды в порядке регистрации */
 let lang = DEFAULT_LANG;
 
-/* meta: {name, transField, tKeysField} — подпись кнопки и поля перевода в данных. */
+/* meta: {name} — подпись кнопки в переключателе. Переводы слов регистрируются
+   отдельно, файлами data/translations_<курс>_<код>.js — см. js/translations.js. */
 function registerLang(code, meta, strings){
   if(!LANGS[code]) LANG_ORDER.push(code);
   LANGS[code] = Object.assign({code:code, strings:strings}, meta);
 }
-function langMeta(){ return LANGS[lang] || LANGS[DEFAULT_LANG]; }
 
 /* ---------- ВЫБОР ЯЗЫКА ---------- */
 function initLang(){

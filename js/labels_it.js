@@ -1,7 +1,7 @@
 "use strict";
 
 /* ---------- ИТАЛЬЯНСКИЙ ---------- */
-registerLang("it", { name:"ITA", transField:"transIt", tKeysField:"tKeysIt" }, {
+registerLang("it", { name:"ITA" }, {
   pageTitle:"DieFliegendeKuh · Unregelmäßige Verben 1–270 · Esercitatore, dizionario e schede",
   pageTitle_prep:"DieFliegendeKuh · Verben mit Präpositionen · Esercitatore, dizionario e schede",
   subtitle:"Unregelmäßige Verben",

@@ -11,7 +11,7 @@ A German verb trainer that runs offline in any browser. It holds two independent
 The app must keep working when `index.html` is opened directly by double-click, with no server. That rules out `fetch()`, XHR, and ES modules (`<script type="module">`) — browsers block all three on `file://` origins. Consequences to respect when changing anything:
 
 - Scripts are plain classic `<script src>` tags sharing one global scope. No `import`/`export`.
-- The verb data is `data/verbs.js` and `data/prepverbs.js`, `.js` files assigning a global — **not** `.json` files, which could only be read via a blocked `fetch()`. The payload inside each is still a valid JSON array.
+- The verb data is `data/verbs.js` and `data/prepverbs.js`, `.js` files assigning a global — **not** `.json` files, which could only be read via a blocked `fetch()`. The payload inside each is still a valid JSON array. The translations of that data live beside it in `data/translations_<course>_<lang>.js`, one `registerTranslations()` call per file, for the same reason.
 - `<link rel="stylesheet">` and `data:` URIs are unaffected and load fine from `file://`, which is why the font and logo stay inlined as base64.
 
 ## Git workflow
@@ -23,9 +23,10 @@ Work happens on short-lived feature branches merged into `main` with merge commi
 ```
 index.html        markup only — no inline CSS or JS
 css/              8 stylesheets, linked in <head>
-js/               11 modules + 3 label files, loaded at the end of <body>
-data/verbs.js     the 270-verb array
-data/prepverbs.js the 111 verb+preposition array
+js/               12 modules + 3 label files, loaded at the end of <body>
+data/verbs.js     the 270-verb array (German + example only)
+data/prepverbs.js the 111 verb+preposition array (German + example only)
+data/translations_<course>_<lang>.js   one file per course × language: id → {trans, tKeys}
 verb-images/      card illustrations, NNN-infinitiv.webp
 ```
 
@@ -44,16 +45,19 @@ Eight `<link rel="stylesheet">` tags in `<head>`. **Link order is the cascade or
 | `css/dict.css` | dictionary search, filter chips, table grid, `hat`/`ist` and `akk`/`dat` colours, `.masked` self-check blur |
 | `css/cards.css` | flashcard, swipe tints, overlay/badge/example reveal states, `.prepline` |
 
-Sixteen `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
+Twenty-two `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
 
 | File | Contents |
 | --- | --- |
-| `data/verbs.js` | `const VERBS` — the data, nothing else |
-| `data/prepverbs.js` | `const PREPVERBS` — the data, nothing else |
-| `js/i18n.js` | the language registry: `LANGS`, `LANG_ORDER`, `registerLang()`, `langMeta()`, `lang`, `initLang()`, `t()`, `tc()`, `applyStaticI18n()`, `setLang()` |
+| `js/i18n.js` | the language registry: `LANGS`, `LANG_ORDER`, `registerLang()`, `lang`, `initLang()`, `t()`, `tc()`, `applyStaticI18n()`, `setLang()` |
 | `js/labels_ru.js` | Russian strings — one `registerLang()` call, nothing else |
 | `js/labels_en.js` | English strings |
 | `js/labels_it.js` | Italian strings |
+| `js/translations.js` | the word-translation registry: `TRANSLATIONS`, `registerTranslations()`, `transEntry()`, `vTransOf()`, `tKeysOf()` |
+| `data/verbs.js` | `const VERBS` — the data, nothing else |
+| `data/prepverbs.js` | `const PREPVERBS` — the data, nothing else |
+| `data/translations_verbs_{ru,en,it}.js` | one `registerTranslations("verbs", …)` call each |
+| `data/translations_prep_{ru,en,it}.js` | one `registerTranslations("prep", …)` call each |
 | `js/course.js` | `COURSES`, `course`, `ITEMS()`, `isPrep()`, `maskExample()`, `setCourse()` |
 | `js/state.js` | `MAXID`/`BYID`, progress load/save, range, presets, folder counts |
 | `js/check.js` | answer normalisation, `checkTrans()`, `checkPerf()`, `checkPrep()`, `checkSecond()`, `secondOf()` |
@@ -65,7 +69,7 @@ Sixteen `<script src>` tags at the end of `<body>`. **Load order is load-bearing
 | `js/io.js` | export/import |
 | `js/main.js` | event wiring + init (must be last) |
 
-A `const` at the top level of one file is visible to every file loaded after it. Cross-file *calls* are order-independent (they happen at runtime), but cross-file *top-level* code is not: `js/course.js` reads `VERBS`/`PREPVERBS` while it parses, and `js/main.js` touches the DOM and every other file's functions, so it stays last. In `js/main.js` the init line calls `loadProgress()` **before** `applyStaticI18n()`, because loading builds the course index (`MAXID`) that the static strings interpolate.
+A `const` at the top level of one file is visible to every file loaded after it. Cross-file *calls* are order-independent (they happen at runtime), but cross-file *top-level* code is not: `js/course.js` reads `VERBS`/`PREPVERBS` while it parses, the `data/translations_*.js` files call `registerTranslations()` while they parse (so `js/translations.js` precedes them), and `js/main.js` touches the DOM and every other file's functions, so it stays last. In `js/main.js` the init line calls `loadProgress()` **before** `applyStaticI18n()`, because loading builds the course index (`MAXID`) that the static strings interpolate.
 
 Sections inside each file are still marked with `/* ---------- NAME ---------- */` comments.
 
@@ -90,28 +94,34 @@ In choice mode `renderQuestion()` hides `#inPerf` and the Kasus chips and fills 
 
 ### Data model
 
-`VERBS` in `data/verbs.js` is a single-line JSON array of 270 objects:
-`{id, inf, hint, aux, pras, prat, perf: [..], trans, tKeys, transEn, tKeysEn, transIt, tKeysIt, example}`.
+`VERBS` in `data/verbs.js` is a JSON array of 270 objects, one per line:
+`{id, inf, hint, aux, pras, prat, perf: [..], example}` — German only; no translation ever lives here.
 
-- `id` (1–270) is stable and load-bearing: it keys progress in localStorage, appears in export files, and forms image filenames. Never renumber. Two verb pairs share an infinitive (033/034 `ausziehen`, 205/206 `umfahren`) — `id` is the only disambiguator.
-- `tKeys*` are lowercase stems used by `checkTrans()` for fuzzy answer matching (exact match, `answer.includes(stem)` for stems ≥3 chars, or stem contains an answer word ≥4 chars). When adding or editing a verb's translation, update its stems too, in all three languages.
+- `id` (1–270) is stable and load-bearing: it keys progress in localStorage, keys the translation files, appears in export files, and forms image filenames. Never renumber. Two verb pairs share an infinitive (033/034 `ausziehen`, 205/206 `umfahren`) — `id` is the only disambiguator.
 - `perf` is an array to allow multiple accepted Perfekt forms; `checkPerf()` normalizes umlauts (`ä`→`ae`, `ß`→`ss`) so ASCII input is accepted.
 
-`PREPVERBS` in `data/prepverbs.js` is the same shape minus the conjugation fields, one object per line:
-`{id, inf, hint, prep, kasus, trans, tKeys, transEn, tKeysEn, transIt, tKeysIt, example}`.
+`PREPVERBS` in `data/prepverbs.js` is the same shape minus the conjugation fields:
+`{id, inf, hint, prep, kasus, example}`.
 
 - `inf` is the verb including a reflexive `sich` (`sich ärgern`); `prep` is the preposition and `kasus` is `"A"` or `"D"`. The pair is the answer, rendered everywhere as `prep + " + " + kasus` by `prepAnswerOf()`.
 - `id` (1–111) follows the source PDF's alphabetical order and keys progress the same way verb ids do — never renumber. Duplicate infinitives are expected (`bestehen`, `sprechen`, …); the preposition is what differs.
-- `tKeys*` work exactly as in `VERBS`. Translations came from the English column of `Verben_mit_Praepositionen_EN.pdf` — the source PDF, no longer tracked in the repo; the Russian and Italian ones were written for this app.
 - Examples are the PDF's, except id 74 (`schicken an`), whose original sentence contained no `an` and would have masked to nothing.
+
+#### Translation files
+
+`data/translations_<course>_<lang>.js` is one `registerTranslations(courseId, code, map)` call, where `map` is `id → {trans, tKeys}`, one id per line — six files today (`verbs`/`prep` × `ru`/`en`/`it`). `js/translations.js` stores them in `TRANSLATIONS["<course>|<lang>"]`; `vTransOf(v)` and `tKeysOf(v)` resolve an entry against the active course and language, falling back to `DEFAULT_LANG` per id, so a half-finished language still renders. Nothing outside `js/translations.js` reads a translation field directly.
+
+- `tKeys` are lowercase stems used by `checkTrans()` for fuzzy answer matching (exact match, `answer.includes(stem)` for stems ≥3 chars, or stem contains an answer word ≥4 chars). When adding or editing a translation, update its stems too, in every language file.
+- Adding an entry to a data array means adding the same `id` to every `data/translations_<course>_*.js`.
+- Prep translations came from the English column of `Verben_mit_Praepositionen_EN.pdf` — the source PDF, no longer tracked in the repo; the Russian and Italian ones were written for this app.
 
 ### I18N
 
-One language = one file. `js/labels_<code>.js` contains a single `registerLang(code, meta, strings)` call; `js/i18n.js` holds only the machinery (`LANGS`, `LANG_ORDER`, `t()`, `tc()`, `setLang()`, …) and no strings. `meta` is `{name, transField, tKeysField}` — the toggle-button caption plus the names of that language's translation fields in the data, which `js/check.js` reads through `langMeta()` instead of a hard-coded lang→field map.
+One language = three files: `js/labels_<code>.js` for the UI strings (a single `registerLang(code, meta, strings)` call, `meta` being just `{name}` — the toggle-button caption) and `data/translations_verbs_<code>.js` / `data/translations_prep_<code>.js` for the word translations. `js/i18n.js` holds only the string machinery (`LANGS`, `LANG_ORDER`, `t()`, `tc()`, `setLang()`, …) and `js/translations.js` only the translation machinery — neither contains data.
 
 `t(key)` looks up the current language and falls back to `DEFAULT_LANG` (`ru`) for a missing key, so a partially translated new language still renders. Static markup is translated via `data-i18n` / `data-i18n-placeholder` attributes resolved by `applyStaticI18n()`. Dynamic screens re-render on language switch inside `setLang()` — add new screens there if they show translated text.
 
-**Adding a language:** copy a `js/labels_*.js`, translate the values, add the `transEn`-style translation/stem fields it names to `data/verbs.js` and `data/prepverbs.js`, and add one `<script src>` tag after `js/i18n.js`. Nothing else — the header buttons are built by `renderLangToggle()` from `LANG_ORDER` (registration order = button order), and `js/main.js` wires the toggle by delegation because those buttons do not exist until `initLang()` runs. `initLang()` runs first in the init line: it resolves the saved language before `loadProgress()` writes its first translated status line.
+**Adding a language** (say Turkish): copy `js/labels_en.js` → `js/labels_tr.js` and translate the values; copy `data/translations_verbs_en.js` and `data/translations_prep_en.js` → `..._tr.js`, change the `"en"` argument to `"tr"` and translate the `trans`/`tKeys` values; add three `<script src>` tags — the labels file after `js/i18n.js`, the two data files after `data/prepverbs.js`. The German data files are not touched at all. Nothing else — the header buttons are built by `renderLangToggle()` from `LANG_ORDER` (registration order = button order), and `js/main.js` wires the toggle by delegation because those buttons do not exist until `initLang()` runs. `initLang()` runs first in the init line: it resolves the saved language before `loadProgress()` writes its first translated status line.
 
 Adding a *string* still means adding it to every `labels_*.js` — the fallback keeps the app working, but it shows Russian.
 
