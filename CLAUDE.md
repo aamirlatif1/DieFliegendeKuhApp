@@ -87,7 +87,7 @@ The trainer's second question field is the one place the courses genuinely diffe
 
 - `inf` is the verb including a reflexive `sich` (`sich ärgern`); `prep` is the preposition and `kasus` is `"A"` or `"D"`. The pair is the answer, rendered everywhere as `prep + " + " + kasus` by `prepAnswerOf()`.
 - `id` (1–111) follows the source PDF's alphabetical order and keys progress the same way verb ids do — never renumber. Duplicate infinitives are expected (`bestehen`, `sprechen`, …); the preposition is what differs.
-- `tKeys*` work exactly as in `VERBS`. Translations came from the English column of `Verben_mit_Praepositionen_EN.pdf`; the Russian and Italian ones were written for this app.
+- `tKeys*` work exactly as in `VERBS`. Translations came from the English column of `Verben_mit_Praepositionen_EN.pdf` — the source PDF, no longer tracked in the repo; the Russian and Italian ones were written for this app.
 - Examples are the PDF's, except id 74 (`schicken an`), whose original sentence contained no `an` and would have masked to nothing.
 
 ### I18N
