@@ -23,7 +23,7 @@ Work happens on short-lived feature branches merged into `main` with merge commi
 ```
 index.html        markup only — no inline CSS or JS
 css/              8 stylesheets, linked in <head>
-js/               10 modules, loaded at the end of <body>
+js/               10 modules + 3 label files, loaded at the end of <body>
 data/verbs.js     the 270-verb array
 data/prepverbs.js the 111 verb+preposition array
 verb-images/      card illustrations, NNN-infinitiv.webp
@@ -44,13 +44,16 @@ Eight `<link rel="stylesheet">` tags in `<head>`. **Link order is the cascade or
 | `css/dict.css` | dictionary search, filter chips, table grid, `hat`/`ist` and `akk`/`dat` colours, `.masked` self-check blur |
 | `css/cards.css` | flashcard, swipe tints, overlay/badge/example reveal states, `.prepline` |
 
-Twelve `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
+Fifteen `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
 
 | File | Contents |
 | --- | --- |
 | `data/verbs.js` | `const VERBS` — the data, nothing else |
 | `data/prepverbs.js` | `const PREPVERBS` — the data, nothing else |
-| `js/i18n.js` | `I18N`, `lang`, `t()`, `tc()`, `applyStaticI18n()`, `setLang()` |
+| `js/i18n.js` | the language registry: `LANGS`, `LANG_ORDER`, `registerLang()`, `langMeta()`, `lang`, `initLang()`, `t()`, `tc()`, `applyStaticI18n()`, `setLang()` |
+| `js/labels_ru.js` | Russian strings — one `registerLang()` call, nothing else |
+| `js/labels_en.js` | English strings |
+| `js/labels_it.js` | Italian strings |
 | `js/course.js` | `COURSES`, `course`, `ITEMS()`, `isPrep()`, `maskExample()`, `setCourse()` |
 | `js/state.js` | `MAXID`/`BYID`, progress load/save, range, presets, folder counts |
 | `js/check.js` | answer normalisation, `checkTrans()`, `checkPerf()`, `checkPrep()`, `checkSecond()`, `secondOf()` |
@@ -92,7 +95,13 @@ The trainer's second question field is the one place the courses genuinely diffe
 
 ### I18N
 
-All UI strings live in the `I18N` object (`js/i18n.js`) with `ru`/`en`/`it` branches; `t(key)` looks up the current language. Static markup is translated via `data-i18n` / `data-i18n-placeholder` attributes resolved by `applyStaticI18n()`. Any new user-facing string must be added to **all three** language branches, and dynamic screens re-render on language switch inside `setLang()` — add new screens there if they show translated text.
+One language = one file. `js/labels_<code>.js` contains a single `registerLang(code, meta, strings)` call; `js/i18n.js` holds only the machinery (`LANGS`, `LANG_ORDER`, `t()`, `tc()`, `setLang()`, …) and no strings. `meta` is `{name, transField, tKeysField}` — the toggle-button caption plus the names of that language's translation fields in the data, which `js/check.js` reads through `langMeta()` instead of a hard-coded lang→field map.
+
+`t(key)` looks up the current language and falls back to `DEFAULT_LANG` (`ru`) for a missing key, so a partially translated new language still renders. Static markup is translated via `data-i18n` / `data-i18n-placeholder` attributes resolved by `applyStaticI18n()`. Dynamic screens re-render on language switch inside `setLang()` — add new screens there if they show translated text.
+
+**Adding a language:** copy a `js/labels_*.js`, translate the values, add the `transEn`-style translation/stem fields it names to `data/verbs.js` and `data/prepverbs.js`, and add one `<script src>` tag after `js/i18n.js`. Nothing else — the header buttons are built by `renderLangToggle()` from `LANG_ORDER` (registration order = button order), and `js/main.js` wires the toggle by delegation because those buttons do not exist until `initLang()` runs. `initLang()` runs first in the init line: it resolves the saved language before `loadProgress()` writes its first translated status line.
+
+Adding a *string* still means adding it to every `labels_*.js` — the fallback keeps the app working, but it shows Russian.
 
 Course-dependent wording goes through `tc(key)`, which prefers `key + "_prep"` when the prep course is active and falls back to `key` otherwise — so only the strings that actually differ need a second entry (`chkPerfLbl_prep`, `dheadPerfekt_prep`, …). `applyStaticI18n()` resolves `data-i18n` through `tc()` and calls the value with `MAXID` if it is a function (that is how `filterAll`/`presetAll` show the right count per course), which is why switching course just re-runs it.
 
@@ -113,7 +122,7 @@ Open `index.html` in a browser and exercise the affected tab by hand — **in bo
 - **Check the DevTools console and Network tab for 404s.** A mistyped `src`/`href`, or a new file never added to `index.html`, fails quietly: the page still renders, just without that rule or function. A missing `js/*.js` usually surfaces as a `ReferenceError` further down the chain rather than at the missing file itself.
 - **Adding a file means adding its tag** to `index.html`, in the right position — see the load-order and cascade-order notes above.
 
-For a fast regression sweep without a browser, jsdom loads the real `index.html` from disk with `runScripts: "dangerously", resources: "usable"` and executes all ten scripts and eight stylesheets. It is good for asserting that screens render, handlers fire, grading works, and that the parsed CSS rule list is unchanged after a refactor. It does no layout and does not implement `window.scrollTo` (harmless errors), so it cannot confirm anything visual. Note that `const` globals live in the global lexical environment, not on `window` — reach them with `window.eval("VERBS")`, not `window.VERBS`. Nothing like this is checked in: install it in a scratch directory outside the repo and keep the repo dependency-free.
+For a fast regression sweep without a browser, jsdom loads the real `index.html` from disk with `runScripts: "dangerously", resources: "usable"` and executes all fifteen scripts and eight stylesheets. It is good for asserting that screens render, handlers fire, grading works, and that the parsed CSS rule list is unchanged after a refactor. It does no layout and does not implement `window.scrollTo` (harmless errors), so it cannot confirm anything visual. Note that `const` globals live in the global lexical environment, not on `window` — reach them with `window.eval("VERBS")`, not `window.VERBS`. It also serves the page from a `file://` URL, whose opaque origin makes `localStorage` throw — the app's try/catch swallows that, but a test that touches storage directly must not. Nothing like this is checked in: install it in a scratch directory outside the repo and keep the repo dependency-free.
 
 ## verb-images/
 

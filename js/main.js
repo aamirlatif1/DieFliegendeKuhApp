@@ -26,7 +26,8 @@ document.querySelectorAll('#ovTrans .chip').forEach(b=>b.addEventListener("click
   const it=document.getElementById("inTrans"); it.classList.remove("good","bad"); it.classList.add(val?"good":"bad");
   const vTrans = vTransOf(curEval.v);
   document.getElementById("corrTrans").innerHTML=val?`<span class="ok">${t("acceptedYes")}</span> ${t("valueLbl")} <span class="sol">${vTrans}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${vTrans}</span>`; }));
-document.querySelectorAll('#langToggle button').forEach(b=>b.addEventListener("click",()=>{ setLang(b.dataset.lang); }));
+/* делегирование: кнопки языков создаются позже, в initLang() */
+document.getElementById("langToggle").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) setLang(b.dataset.lang); });
 document.querySelectorAll('#courseToggle button').forEach(b=>b.addEventListener("click",()=>{ setCourse(b.dataset.course); }));
 document.querySelectorAll('#kasusPick button').forEach(b=>b.addEventListener("click",()=>{
   const on=b.classList.contains("sel"); clearKasus(); if(!on) b.classList.add("sel"); }));
@@ -46,6 +47,7 @@ document.addEventListener("keydown",e=>{ if(document.getElementById("learnDeckSc
   else if(e.key===" "||e.key==="Enter"){ e.preventDefault(); learnTap(); } });
 
 /* ---------- INIT ---------- */
-/* loadProgress() первым: он строит индекс курса, из которого applyStaticI18n() берёт число глаголов. */
-loadProgress(); applyStaticI18n(); applyCourseUI(); clampLearnRange();
+/* initLang() до loadProgress(): тот пишет в «Прогресс сохранён» уже на нужном языке.
+   loadProgress() до applyStaticI18n(): он строит индекс курса, из которого берётся число глаголов. */
+initLang(); loadProgress(); applyStaticI18n(); applyCourseUI(); clampLearnRange();
 renderPresets(); onRangeChange(); renderLearnPresets(); onLearnRangeChange(); show("home");
