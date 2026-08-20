@@ -2,11 +2,31 @@
 
 /* ---------- ВАРИАНТЫ ОТВЕТА ---------- */
 /* Режим «выбор из вариантов»: к правильному ответу подбираются три ложных.
-   В курсе предлогов это чужие пары «предлог + падеж», в курсе форм — неверные
-   формы Perfekt того же глагола (не чужие, чтобы вариант нельзя было угадать по корню). */
+   Для перевода это переводы чужих слов (buildTransChoices), для второго поля —
+   чужие пары «предлог + падеж» / «артикль + мн. число» либо неверные формы Perfekt
+   того же глагола (не чужие, чтобы вариант нельзя было угадать по корню). */
 const CHOICE_COUNT = 4;
 
 function shuffled(a){ const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
+
+/* ---------- ПЕРЕВОД ---------- */
+/* Ложные варианты — переводы чужих слов: сначала из выбранного диапазона (одна глава,
+   одна тема — вариант не отсекается «по смыслу»), потом из всего курса.
+   Сравниваются свёрнутые формы (normRu), чтобы два одинаковых перевода не попали в список. */
+function transDistractors(v, n){
+  const right = vTransOf(v), out = [], taken = {};
+  taken[normRu(right)] = 1;
+  const add = x => { const s = vTransOf(x), k = normRu(s);
+    if(!s || taken[k] || out.length>=n) return; taken[k]=1; out.push(s); };
+  shuffled(rangeVerbs()).forEach(add);
+  if(out.length<n) shuffled(ITEMS()).forEach(add);
+  return out;
+}
+/* → {correct, options} для поля перевода. */
+function buildTransChoices(v){
+  const correct = vTransOf(v);
+  return {correct:correct, options:shuffled([correct].concat(transDistractors(v, CHOICE_COUNT-1)))};
+}
 
 /* ---------- ПРЕДЛОГИ ---------- */
 /* Пул — все пары «предлог + падеж», встречающиеся в курсе (их 17), кроме правильной.

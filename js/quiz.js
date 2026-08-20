@@ -13,7 +13,7 @@ function renderModes(){
     box.appendChild(row); });
 }
 function selectedMode(){ const r=document.querySelector(".mode-row.sel"); return r?r.dataset.mode:null; }
-/* Как отвечать на второй вопрос: ввод с клавиатуры или выбор из вариантов. */
+/* Как отвечать на оба вопроса: ввод с клавиатуры или выбор из вариантов. */
 function selectedAnsMode(){ const r=document.querySelector('input[name="ansmode"]:checked'); return r?r.value:"input"; }
 
 /* ---------- ТЕСТ ---------- */
@@ -36,34 +36,56 @@ function startQuiz(mode){
   /* Если спрашивается только второе поле, слова без второго ответа (глаголы, обороты) выпадают. */
   if(!askT) queue=queue.filter(hasSecond);
   if(queue.length===0){ alert(t("alertEmptyPool")); return; }
-  session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null}; show("quiz"); renderQuestion();
+  session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null,tchoices:null,tpick:null}; show("quiz"); renderQuestion();
 }
 function curItem(){ return session ? session.queue[session.idx] : null; }
 /* Второй вопрос задаётся, только если у слова вообще есть второй ответ. */
 function askSecond(){ const v=curItem(); return !!session && session.askP && !!v && hasSecond(v); }
-/* Варианты показываются только вместо второго поля — перевод всегда вводится текстом. */
+/* Режим вариантов включается сразу для обоих полей — каждое со своей четвёркой. */
+function transChoiceOn(){ return !!session && session.ansMode==="choice" && session.askT; }
 function choiceOn(){ return !!session && session.ansMode==="choice" && askSecond(); }
-function renderChoices(v){
-  const box=document.getElementById("choiceList"); box.innerHTML="";
-  session.choices=buildChoices(v); session.pick=null;
-  session.choices.options.forEach((o,i)=>{
+const TRANS_BOX="transChoices", SECOND_BOX="choiceList";
+/* Смещение нумерации второго списка: если варианты перевода на экране, он идёт с 5. */
+function choiceOffset(){ return transChoiceOn()?CHOICE_COUNT:0; }
+function renderChoiceBox(box, data, offset){
+  const el=document.getElementById(box); el.innerHTML="";
+  data.options.forEach((o,i)=>{
     const b=document.createElement("button"); b.type="button"; b.className="choice"; b.dataset.val=o;
-    const k=document.createElement("span"); k.className="k"; k.textContent=i+1;
+    const k=document.createElement("span"); k.className="k"; k.textContent=i+1+offset;
     const val=document.createElement("span"); val.textContent=o;
     b.appendChild(k); b.appendChild(val);
-    b.addEventListener("click",()=>pickChoice(i));
-    box.appendChild(b); });
+    b.addEventListener("click",()=>pickChoice(box,i));
+    el.appendChild(b); });
 }
-function pickChoice(i){
-  if(!choiceOn()||!session.choices) return;
-  const bs=document.querySelectorAll("#choiceList .choice");
+function renderChoices(v){
+  if(transChoiceOn()){ session.tchoices=buildTransChoices(v); session.tpick=null; renderChoiceBox(TRANS_BOX, session.tchoices, 0); }
+  if(choiceOn()){ session.choices=buildChoices(v); session.pick=null; renderChoiceBox(SECOND_BOX, session.choices, choiceOffset()); }
+}
+function pickChoice(box, i){
+  if(!session) return;
+  if(box===TRANS_BOX ? !transChoiceOn() : !choiceOn()) return;
+  const bs=document.querySelectorAll("#"+box+" .choice");
   if(!bs[i]||bs[i].disabled) return;
-  bs.forEach(b=>b.classList.remove("sel")); bs[i].classList.add("sel"); session.pick=bs[i].dataset.val;
+  bs.forEach(b=>b.classList.remove("sel")); bs[i].classList.add("sel");
+  if(box===TRANS_BOX) session.tpick=bs[i].dataset.val; else session.pick=bs[i].dataset.val;
 }
-function markChoices(){
-  const right=session.choices.correct;
-  document.querySelectorAll("#choiceList .choice").forEach(b=>{ b.disabled=true; b.classList.remove("sel");
-    if(b.dataset.val===right) b.classList.add("good"); else if(b.dataset.val===session.pick) b.classList.add("bad"); });
+/* Клавиши 1–4 — перевод, 5–8 — второе поле; цифра на кнопке совпадает с клавишей. */
+function pickByKey(d){
+  const off=choiceOffset();
+  if(transChoiceOn() && d<=CHOICE_COUNT) pickChoice(TRANS_BOX, d-1);
+  else pickChoice(SECOND_BOX, d-1-off);
+}
+function markChoices(box, right, pick){
+  document.querySelectorAll("#"+box+" .choice").forEach(b=>{ b.disabled=true; b.classList.remove("sel");
+    if(b.dataset.val===right) b.classList.add("good"); else if(b.dataset.val===pick) b.classList.add("bad"); });
+}
+/* Поле, которое не спрашивается, показывается готовым — иначе вопрос остаётся без контекста. */
+function renderGiven(v, askP){
+  const box=document.getElementById("qgiven"); const parts=[];
+  if(!session.askT) parts.push([t("dheadTrans"), vTransOf(v)]);
+  if(!askP && hasSecond(v)) parts.push([tc("dheadPerfekt"), secondOf(v)]);
+  box.innerHTML=parts.map(p=>`<span class="g"><span class="k">${escapeHtml(p[0])}</span><span class="v">${escapeHtml(p[1])}</span></span>`).join("");
+  box.classList.toggle("hide", parts.length===0);
 }
 function renderQuestion(){
   const v=session.queue[session.idx], total=session.queue.length;
@@ -76,39 +98,48 @@ function renderQuestion(){
   qex.textContent = isPrep()? maskExample(v) : (isWort()? maskWord(v) : "");
   qex.classList.toggle("hide", !withEx);
   const askP=askSecond();
+  renderGiven(v, askP);
   document.getElementById("fTrans").classList.toggle("hide",!session.askT);
   document.getElementById("fPerf").classList.toggle("hide",!askP);
   const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf");
   it.value="";ip.value="";it.className="";ip.className="";it.disabled=false;ip.disabled=false;
   clearKasus(); clearArt();
-  const ch=choiceOn(), cl=document.getElementById("choiceList");
+  const ch=choiceOn(), tch=transChoiceOn();
+  const cl=document.getElementById("choiceList"), tl=document.getElementById("transChoices");
+  it.classList.toggle("hide",tch);
   ip.classList.toggle("hide",ch);
   document.getElementById("kasusPick").classList.toggle("hide",!isPrep()||ch);
   document.getElementById("artPick").classList.toggle("hide",!isWort()||ch);
-  cl.classList.toggle("hide",!ch);
-  if(ch) renderChoices(v); else { cl.innerHTML=""; session.choices=null; session.pick=null; }
+  cl.classList.toggle("hide",!ch); tl.classList.toggle("hide",!tch);
+  if(!ch){ cl.innerHTML=""; session.choices=null; session.pick=null; }
+  if(!tch){ tl.innerHTML=""; session.tchoices=null; session.tpick=null; }
+  renderChoices(v);
   document.getElementById("corrTrans").classList.add("hide"); document.getElementById("corrPerf").classList.add("hide"); document.getElementById("ovTrans").classList.add("hide");
   document.getElementById("checkBtn").classList.remove("hide"); document.getElementById("nextBtn").classList.add("hide");
-  setTimeout(()=>{ if(session.askT) it.focus(); else if(!ch && askP) ip.focus(); },50);
+  setTimeout(()=>{ if(session.askT && !tch) it.focus(); else if(!ch && askP) ip.focus(); },50);
 }
 function doCheck(){
-  if(choiceOn() && session.pick===null){ alert(t("alertPickOption")); return; }
+  /* Незаполненные варианты — до проверки перевода, чтобы вопрос остался отвечаемым. */
+  if((transChoiceOn() && session.tpick===null) || (choiceOn() && session.pick===null)){ alert(t("alertPickOption")); return; }
   const v=session.queue[session.idx]; const askP=askSecond();
   const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf"); let okT=true, okP=true;
-  const vTrans = vTransOf(v); let ansP = ip.value;
-  if(session.askT){ okT=checkTrans(v,it.value); it.disabled=true; it.classList.add(okT?"good":"bad");
+  const vTrans = vTransOf(v); let ansP = ip.value, ansT = it.value;
+  if(session.askT){
+    if(transChoiceOn()){ ansT=session.tpick; okT=(ansT===session.tchoices.correct); markChoices(TRANS_BOX, session.tchoices.correct, session.tpick); }
+    else { okT=checkTrans(v,it.value); it.disabled=true; it.classList.add(okT?"good":"bad"); }
     const ct=document.getElementById("corrTrans"); ct.classList.remove("hide");
     ct.innerHTML=okT?`<span class="ok">${t("correctYes")}</span> ${t("valueLbl")} <span class="sol">${vTrans}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${vTrans}</span>`;
-    document.getElementById("ovTrans").classList.remove("hide"); styleOverride(okT); }
+    /* «Засчитать перевод?» нужно только при вводе — у выбора из вариантов спорных ответов нет. */
+    if(!transChoiceOn()){ document.getElementById("ovTrans").classList.remove("hide"); styleOverride(okT); } }
   if(askP){
-    if(choiceOn()){ ansP=session.pick; okP=(ansP===session.choices.correct); markChoices(); }
+    if(choiceOn()){ ansP=session.pick; okP=(ansP===session.choices.correct); markChoices(SECOND_BOX, session.choices.correct, session.pick); }
     else { okP=checkSecond(v,ip.value,isWort()?selectedArt():selectedKasus()); ip.disabled=true; ip.classList.add(okP?"good":"bad");
       /* в курсе словаря артикль может быть выбран кнопкой — склеиваем, чтобы в разборе ошибок был весь ответ */
       if(isWort()) ansP=[selectedArt(), ip.value.trim()].filter(Boolean).join(" "); }
     const sol=secondOf(v);
     const cp=document.getElementById("corrPerf"); cp.classList.remove("hide");
     cp.innerHTML=okP?`<span class="ok">${t("correctYes")}</span> <span class="sol">${sol}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${sol}</span>`; }
-  curEval={okT,okP,v,askP,ansT:it.value,ansP};
+  curEval={okT,okP,v,askP,ansT,ansP};
   document.getElementById("checkBtn").classList.add("hide"); document.getElementById("nextBtn").classList.remove("hide"); document.getElementById("nextBtn").focus();
 }
 function selectedKasus(){ const b=document.querySelector("#kasusPick button.sel"); return b?b.dataset.k:""; }
@@ -144,4 +175,4 @@ function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&
 function retryWrong(){ const ids=(session&&session._wrongIds)||[]; if(ids.length===0){ alert(t("alertNoWrong")); return; }
   const askT=document.getElementById("chkTrans").checked, askP=document.getElementById("chkPerf").checked; let queue=ids.map(id=>BYID[id]);
   if(document.getElementById("chkShuffle").checked){ for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]];} }
-  session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null}; show("quiz"); renderQuestion(); }
+  session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null,tchoices:null,tpick:null}; show("quiz"); renderQuestion(); }

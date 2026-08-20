@@ -6,7 +6,7 @@
    перевести строки, добавить <script src> в index.html — больше ничего править не нужно.
    Порядок тегов = порядок кнопок в переключателе языка. */
 const LANG_KEY = "deutsch_verben_1_270_lang";
-const DEFAULT_LANG = "ru";
+const DEFAULT_LANG = "en";
 const LANGS = {};        /* код → {code, name, strings} */
 const LANG_ORDER = [];   /* коды в порядке регистрации */
 let lang = DEFAULT_LANG;

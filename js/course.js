@@ -3,12 +3,17 @@
 /* ---------- КУРСЫ (наборы данных) ---------- */
 const COURSE_KEY = "deutsch_course";
 /* groupBy: поле, по которому строятся пресеты диапазонов (у словаря — глава книги);
-   если его нет, диапазоны нарезаются кусками по chunk. */
+   если его нет, диапазоны нарезаются кусками по chunk.
+   test: значения галочек теста по умолчанию — их выставляет applyTestDefaults()
+   при старте и при переключении курса (сами галочки нигде не сохраняются). */
 const COURSES = {
-  verbs:{ id:"verbs", data:VERBS,      store:"deutsch_verben_1_270_v1", chunk:35, images:true  },
-  prep: { id:"prep",  data:PREPVERBS,  store:"deutsch_praep_1_111_v1",  chunk:25, images:false },
+  verbs:{ id:"verbs", data:VERBS,      store:"deutsch_verben_1_270_v1", chunk:35, images:true,
+          test:{ trans:false, perf:true, ansMode:"choice" } },
+  prep: { id:"prep",  data:PREPVERBS,  store:"deutsch_praep_1_111_v1",  chunk:25, images:false,
+          test:{ trans:false, perf:true, ansMode:"choice" } },
   wort: { id:"wort",  data:WORTSCHATZ, store:"deutsch_wortschatz_b2_v1", chunk:40, images:false,
-          groupBy:"kap", groupLabel:(k)=>"K"+k }
+          groupBy:"kap", groupLabel:(k)=>"K"+k,
+          test:{ trans:true, perf:false, ansMode:"choice" } }
 };
 const COURSE_IDS = ["verbs","prep","wort"];
 let course = "verbs";
@@ -62,8 +67,17 @@ function maskWord(v){
 }
 
 /* ---------- ПЕРЕКЛЮЧЕНИЕ КУРСА ---------- */
+/* Галочки теста по умолчанию для текущего курса. */
+function applyTestDefaults(){
+  const d = C().test; if(!d) return;
+  document.getElementById("chkTrans").checked = !!d.trans;
+  document.getElementById("chkPerf").checked = !!d.perf;
+  const r = document.querySelector('input[name="ansmode"][value="'+d.ansMode+'"]');
+  if(r) r.checked = true;
+}
 function applyCourseUI(){
   document.querySelectorAll("#courseToggle button").forEach(b=>b.classList.toggle("sel", b.dataset.course===course));
+  applyTestDefaults();
   ["rFrom","rTo","rFromL","rToL"].forEach(id=>document.getElementById(id).setAttribute("max", MAXID));
   document.getElementById("kasusPick").classList.toggle("hide", !isPrep());
   document.getElementById("artPick").classList.toggle("hide", !isWort());
