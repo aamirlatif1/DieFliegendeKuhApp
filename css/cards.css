@@ -18,5 +18,6 @@
 .learncard-forms .perfline{margin-top:6px; font-weight:800; font-size:16px}
 .learncard-forms .perfline.hat{color:#fff} .learncard-forms .perfline.ist{color:#a9c9ff}
 .learncard-trans{font-size:23px; font-weight:700; text-shadow:0 2px 6px rgba(0,0,0,.55)}
+.learncard-trans .prepline{font-size:27px; font-weight:800; color:#ffd257; margin-bottom:8px}
 .learncard-example{position:absolute; left:0; right:0; bottom:0; padding:22px 22px 26px; background:linear-gradient(transparent, rgba(0,0,0,.82) 55%); color:#fff; font-family:"VT323",ui-monospace,"Courier New",monospace; font-size:26px; letter-spacing:.3px; line-height:1.35; text-align:center; opacity:0; pointer-events:none; transition:opacity .2s; text-shadow:0 2px 4px rgba(0,0,0,.6)}
 .learncard-example.show2{opacity:1}

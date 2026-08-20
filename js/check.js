@@ -15,3 +15,26 @@ function checkTrans(v,ans){ const a=normRu(ans); if(!a)return false;
     if(kk.length>=3 && a.includes(kk)) return true;
     const words=a.split(" ").filter(w=>w.length>=4); for(const w of words){ if(kk.includes(w)) return true; } } return false; }
 function vTransOf(v){ return v[TRANS_FIELD[lang]]; }
+
+/* ---------- ПРЕДЛОГ + ПАДЕЖ ---------- */
+/* Падеж можно выбрать кнопкой или дописать словом: «über + A», «ueber akk», «über accusativo». */
+const KASUS_WORDS = {
+  a:"A", akk:"A", akku:"A", akkusativ:"A", acc:"A", accusative:"A", accusativo:"A", "вин":"A", "винительный":"A",
+  d:"D", dat:"D", dativ:"D", dative:"D", dativo:"D", "дат":"D", "дательный":"D"
+};
+function parsePrepAnswer(s){
+  const txt = foldDe((s||"").toLowerCase()).replace(/[+.,;!?()]/g," ").replace(/\s+/g," ").trim();
+  if(!txt) return {prep:"", kasus:""};
+  let kasus=""; const rest=[];
+  txt.split(" ").forEach(w=>{ const k=KASUS_WORDS[w]; if(k) kasus=k; else rest.push(w); });
+  return {prep:rest.join(" "), kasus};
+}
+function checkPrep(v,ans,kasusPick){
+  const p = parsePrepAnswer(ans);
+  if(!p.prep) return false;
+  const kasus = p.kasus || kasusPick || "";
+  return p.prep === foldDe(v.prep) && kasus === v.kasus;
+}
+/* Второе поле теста: Perfekt в курсе форм, предлог + падеж в курсе предлогов. */
+function checkSecond(v,ans,kasusPick){ return isPrep()? checkPrep(v,ans,kasusPick) : checkPerf(v,ans); }
+function secondOf(v){ return isPrep()? prepAnswerOf(v) : v.perf.join(" / "); }

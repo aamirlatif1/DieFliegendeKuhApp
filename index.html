@@ -28,6 +28,11 @@
     </div>
   </header>
 
+  <div class="courses" id="courseToggle">
+    <button data-course="verbs" class="sel" data-i18n="courseVerbs">🔤 Формы глаголов</button>
+    <button data-course="prep" data-i18n="coursePrep">🔗 Глаголы с предлогами</button>
+  </div>
+
   <div class="nav" id="nav">
     <button data-tab="home" class="sel" data-i18n="navHome">🎯 Тренажёр</button>
     <button data-tab="dict" data-i18n="navDict">📖 Словарь</button>
@@ -109,6 +114,7 @@
       <div class="pbar"><i id="pfill"></i></div>
       <div class="qmeta"><span id="qpos"></span><span id="qscore"></span></div>
       <div class="verb" id="qverb"></div>
+      <div class="qexample hide" id="qexample"></div>
       <div class="field" id="fTrans">
         <label data-i18n="transFieldLbl">Перевод (на русский)</label>
         <input id="inTrans" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="transFieldPh" placeholder="напр. прерывать">
@@ -122,6 +128,10 @@
       <div class="field" id="fPerf">
         <label data-i18n="perfFieldLbl">Perfekt (со вспомог. глаголом)</label>
         <input id="inPerf" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="perfFieldPh" placeholder="напр. hat abgebrochen">
+        <div class="kasuspick hide" id="kasusPick">
+          <button type="button" class="chip" data-k="A" data-i18n="kasusA">Akkusativ (A)</button>
+          <button type="button" class="chip" data-k="D" data-i18n="kasusD">Dativ (D)</button>
+        </div>
         <div class="correct hide" id="corrPerf"></div>
       </div>
       <div class="divider"></div>
@@ -214,7 +224,9 @@
 </div>
 
 <script src="data/verbs.js"></script>
+<script src="data/prepverbs.js"></script>
 <script src="js/i18n.js"></script>
+<script src="js/course.js"></script>
 <script src="js/state.js"></script>
 <script src="js/check.js"></script>
 <script src="js/nav.js"></script>

@@ -9,19 +9,19 @@ function learnStatusesChecked(){
   return { "new":document.getElementById("chkFNew").checked, notlearned:document.getElementById("chkFNotLearned").checked,
     repeated:document.getElementById("chkFRepeated").checked, learned:document.getElementById("chkFLearned").checked };
 }
-function buildLearnQueue(){ const st=learnStatusesChecked(); return VERBS.filter(learnInRange).filter(v=>st[status[v.id]]); }
+function buildLearnQueue(){ const st=learnStatusesChecked(); return ITEMS().filter(learnInRange).filter(v=>st[status[v.id]]); }
 function renderLearnPresets(){
   const box=document.getElementById("presetsL"); box.innerHTML="";
-  PRESETS.forEach(([a,b])=>{ const btn=document.createElement("button"); btn.textContent=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
+  presetRanges().forEach(([a,b])=>{ const btn=document.createElement("button"); btn.textContent=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
     btn.addEventListener("click",()=>{ document.getElementById("rFromL").value=a; document.getElementById("rToL").value=b; onLearnRangeChange(); }); box.appendChild(btn); });
-  const all=document.createElement("button"); all.textContent=t("presetAll"); all.dataset.a=1; all.dataset.b=MAXID;
+  const all=document.createElement("button"); all.textContent=tc("presetAll")(MAXID); all.dataset.a=1; all.dataset.b=MAXID;
   all.addEventListener("click",()=>{ document.getElementById("rFromL").value=1; document.getElementById("rToL").value=MAXID; onLearnRangeChange(); }); box.appendChild(all);
 }
 function markActivePresetL(){ const {from,to}=learnRange(); document.querySelectorAll("#presetsL button").forEach(b=>b.classList.toggle("sel", parseInt(b.dataset.a)===from && parseInt(b.dataset.b)===to)); }
 function onLearnRangeChange(){
   const warn=document.getElementById("rWarnL"), startBtn=document.getElementById("learnStartBtn");
   if(!learnRangeValid()){ warn.classList.remove("hide"); warn.textContent=t("rangeWarn")(MAXID); startBtn.disabled=true; document.getElementById("rangeCountL").textContent=""; }
-  else{ warn.classList.add("hide"); startBtn.disabled=false; const n=VERBS.filter(learnInRange).length; document.getElementById("rangeCountL").textContent="· "+n+" "+t("verbWord")(n); }
+  else{ warn.classList.add("hide"); startBtn.disabled=false; const n=ITEMS().filter(learnInRange).length; document.getElementById("rangeCountL").textContent="· "+n+" "+t("verbWord")(n); }
   markActivePresetL();
 }
 let learnDeck=null, cardState=0, learnDrag=null;
@@ -36,18 +36,29 @@ function startLearnDeck(){
 function renderLearnCard(){
   const v=learnDeck.queue[learnDeck.idx];
   const img=document.getElementById("learnCardImg"), fallback=document.getElementById("learnCardFallback");
-  fallback.classList.add("hide"); img.classList.remove("hide");
-  img.onerror=()=>{ img.classList.add("hide"); fallback.classList.remove("hide"); };
-  img.src=verbImgPath(v);
+  /* Картинки есть только у курса форм; у предлогов сразу показываем заглушку. */
+  if(C().images){
+    fallback.classList.add("hide"); img.classList.remove("hide");
+    img.onerror=()=>{ img.classList.add("hide"); fallback.classList.remove("hide"); };
+    img.src=verbImgPath(v);
+  } else {
+    img.classList.add("hide"); img.removeAttribute("src"); fallback.classList.remove("hide");
+  }
   document.getElementById("learnCardBadge").textContent=STATUS_EMOJI[status[v.id]]||"📘";
   document.getElementById("learnCardInf").innerHTML=v.inf+(v.hint?` <span class="hint">(${v.hint})</span>`:"");
-  const perfCls=v.perf[0].startsWith("ist")?"ist":"hat";
-  document.getElementById("learnCardForms").innerHTML=`<div>${v.pras} · ${v.prat}</div><div class="perfline ${perfCls}">${v.perf.join(" / ")}</div>`;
-  document.getElementById("learnCardTrans").textContent=vTransOf(v);
+  const forms=document.getElementById("learnCardForms"), trans=document.getElementById("learnCardTrans");
+  if(isPrep()){
+    forms.innerHTML=`<div>${maskExample(v)}</div>`;
+    trans.innerHTML=`<div class="prepline">${prepAnswerOf(v)}</div><div>${vTransOf(v)}</div>`;
+  } else {
+    const perfCls=v.perf[0].startsWith("ist")?"ist":"hat";
+    forms.innerHTML=`<div>${v.pras} · ${v.prat}</div><div class="perfline ${perfCls}">${v.perf.join(" / ")}</div>`;
+    trans.textContent=vTransOf(v);
+  }
   document.getElementById("learnCardExample").textContent=v.example||"";
   cardState=0; applyLearnCardState();
   const nextV=learnDeck.queue[(learnDeck.idx+1)%learnDeck.queue.length];
-  if(nextV){ const pre=new Image(); pre.src=verbImgPath(nextV); }
+  if(nextV && C().images){ const pre=new Image(); pre.src=verbImgPath(nextV); }
 }
 function applyLearnCardState(){
   const img=document.getElementById("learnCardImg"), overlay=document.getElementById("learnCardOverlay"),

@@ -29,7 +29,7 @@ function buildQueue(mode){
 function startQuiz(mode){
   if(!rangeValid()){ alert(t("alertNoRange")); show("home"); return; }
   const askT=document.getElementById("chkTrans").checked, askP=document.getElementById("chkPerf").checked;
-  if(!askT&&!askP){ alert(t("alertChooseOne")); return; }
+  if(!askT&&!askP){ alert(tc("alertChooseOne")); return; }
   const queue=buildQueue(mode);
   if(queue.length===0){ alert(t("alertEmptyPool")); return; }
   session={queue,idx:0,results:[],askT,askP}; show("quiz"); renderQuestion();
@@ -40,10 +40,14 @@ function renderQuestion(){
   document.getElementById("qpos").textContent=t("qpos")(session.idx+1, total, v.id);
   document.getElementById("qscore").textContent=`✓ ${session.results.filter(r=>r.ok).length}`;
   document.getElementById("qverb").innerHTML=`${v.inf}`+(v.hint?` <span class="hint">(${v.hint})</span>`:"");
+  const qex=document.getElementById("qexample");
+  qex.textContent = isPrep()? maskExample(v) : "";
+  qex.classList.toggle("hide", !isPrep());
   document.getElementById("fTrans").classList.toggle("hide",!session.askT);
   document.getElementById("fPerf").classList.toggle("hide",!session.askP);
   const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf");
   it.value="";ip.value="";it.className="";ip.className="";it.disabled=false;ip.disabled=false;
+  clearKasus();
   document.getElementById("corrTrans").classList.add("hide"); document.getElementById("corrPerf").classList.add("hide"); document.getElementById("ovTrans").classList.add("hide");
   document.getElementById("checkBtn").classList.remove("hide"); document.getElementById("nextBtn").classList.add("hide");
   setTimeout(()=>{(session.askT?it:ip).focus();},50);
@@ -55,12 +59,15 @@ function doCheck(){
     const ct=document.getElementById("corrTrans"); ct.classList.remove("hide");
     ct.innerHTML=okT?`<span class="ok">${t("correctYes")}</span> ${t("valueLbl")} <span class="sol">${vTrans}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${vTrans}</span>`;
     document.getElementById("ovTrans").classList.remove("hide"); styleOverride(okT); }
-  if(session.askP){ okP=checkPerf(v,ip.value); ip.disabled=true; ip.classList.add(okP?"good":"bad");
+  if(session.askP){ okP=checkSecond(v,ip.value,selectedKasus()); ip.disabled=true; ip.classList.add(okP?"good":"bad");
+    const sol=secondOf(v);
     const cp=document.getElementById("corrPerf"); cp.classList.remove("hide");
-    cp.innerHTML=okP?`<span class="ok">${t("correctYes")}</span> <span class="sol">${v.perf.join(" / ")}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${v.perf.join(" / ")}</span>`; }
+    cp.innerHTML=okP?`<span class="ok">${t("correctYes")}</span> <span class="sol">${sol}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${sol}</span>`; }
   curEval={okT,okP,v,ansT:it.value,ansP:ip.value};
   document.getElementById("checkBtn").classList.add("hide"); document.getElementById("nextBtn").classList.remove("hide"); document.getElementById("nextBtn").focus();
 }
+function selectedKasus(){ const b=document.querySelector("#kasusPick button.sel"); return b?b.dataset.k:""; }
+function clearKasus(){ document.querySelectorAll("#kasusPick button").forEach(b=>b.classList.remove("sel")); }
 function styleOverride(okT){ const b=document.querySelectorAll('#ovTrans .chip'); b.forEach(x=>x.classList.remove("on-ok","on-bad")); if(okT)b[0].classList.add("on-ok"); else b[1].classList.add("on-bad"); }
 function nextQuestion(){
   const e=curEval; const ok=(session.askT?e.okT:true)&&(session.askP?e.okP:true);
@@ -80,9 +87,10 @@ function showResults(){
   else{ errIntro.innerHTML=t("errIntro")(wrong.length,total); let rows="";
     wrong.forEach(r=>{ const v=r.v; const vTrans=vTransOf(v);
       let tCell = !r.askT?"—":(r.okT?`<span class="badge s">${t("badgeCorrect")}</span>`:`<div class="you">✗ ${escapeHtml(r.ansT)||"—"}</div><div class="sol">✓ ${vTrans}</div>`);
-      let pCell = !r.askP?"—":(r.okP?`<span class="badge s">${t("badgeCorrect")}</span>`:`<div class="you">✗ ${escapeHtml(r.ansP)||"—"}</div><div class="sol">✓ ${v.perf.join(" / ")}</div>`);
-      rows+=`<tr><td><b>${v.inf}</b>${v.hint?` <span class="muted">(${v.hint})</span>`:""}<div class="muted" style="font-size:11px">№${v.id} · ${v.aux}</div></td><td>${tCell}</td><td>${pCell}</td></tr>`; });
-    errBody.innerHTML=`<table><thead><tr><th>${t("thVerb")}</th><th>${t("thTrans")}</th><th>${t("thPerf")}</th></tr></thead><tbody>${rows}</tbody></table>`; }
+      let pCell = !r.askP?"—":(r.okP?`<span class="badge s">${t("badgeCorrect")}</span>`:`<div class="you">✗ ${escapeHtml(r.ansP)||"—"}</div><div class="sol">✓ ${secondOf(v)}</div>`);
+      const sub = isPrep()? `№${v.id}` : `№${v.id} · ${v.aux}`;
+      rows+=`<tr><td><b>${v.inf}</b>${v.hint?` <span class="muted">(${v.hint})</span>`:""}<div class="muted" style="font-size:11px">${sub}</div></td><td>${tCell}</td><td>${pCell}</td></tr>`; });
+    errBody.innerHTML=`<table><thead><tr><th>${t("thVerb")}</th><th>${t("thTrans")}</th><th>${tc("thPerf")}</th></tr></thead><tbody>${rows}</tbody></table>`; }
   session._wrongIds=wrong.map(r=>r.id); show("result");
 }
 function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
