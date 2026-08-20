@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A German verb trainer that runs offline in any browser. It holds two independent **courses**, picked with a toggle above the nav tabs: *verb forms* (270 irregular verbs — Präsens/Präteritum/Perfekt) and *verbs with prepositions* (111 fixed `Verb + Präposition + Kasus` combinations). Both courses share every screen (trainer, dictionary, cards) but keep separate ranges and separate progress. There is no build system, package manager, linter, or test framework — the files are served to the browser exactly as they sit on disk. UI languages are Russian (default), English, and Italian; repo docs and code comments are in Russian.
+A German verb trainer that runs offline in any browser. It holds two independent **courses**, picked with a toggle above the nav tabs: *verb forms* (270 irregular verbs — Präsens/Präteritum/Perfekt) and *verbs with prepositions* (111 fixed `Verb + Präposition + Kasus` combinations). Both courses share every screen (trainer, dictionary, cards) but keep separate ranges and separate progress. There is no build system, package manager, linter, or test framework — the files are served to the browser exactly as they sit on disk. UI languages are Russian (default), English, Italian, and Turkish; repo docs and code comments are in Russian.
 
 ### The `file://` constraint
 
@@ -23,7 +23,7 @@ Work happens on short-lived feature branches merged into `main` with merge commi
 ```
 index.html        markup only — no inline CSS or JS
 css/              8 stylesheets, linked in <head>
-js/               12 modules + 3 label files, loaded at the end of <body>
+js/               12 modules + 4 label files, loaded at the end of <body>
 data/verbs.js     the 270-verb array (German + example only)
 data/prepverbs.js the 111 verb+preposition array (German + example only)
 data/translations_<course>_<lang>.js   one file per course × language: id → {trans, tKeys}
@@ -45,7 +45,7 @@ Eight `<link rel="stylesheet">` tags in `<head>`. **Link order is the cascade or
 | `css/dict.css` | dictionary search, filter chips, table grid, `hat`/`ist` and `akk`/`dat` colours, `.masked` self-check blur |
 | `css/cards.css` | flashcard, swipe tints, overlay/badge/example reveal states, `.prepline` |
 
-Twenty-two `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
+Twenty-six `<script src>` tags at the end of `<body>`. **Load order is load-bearing** — each file declares globals the later ones use at parse time:
 
 | File | Contents |
 | --- | --- |
@@ -53,11 +53,12 @@ Twenty-two `<script src>` tags at the end of `<body>`. **Load order is load-bear
 | `js/labels_ru.js` | Russian strings — one `registerLang()` call, nothing else |
 | `js/labels_en.js` | English strings |
 | `js/labels_it.js` | Italian strings |
+| `js/labels_tr.js` | Turkish strings |
 | `js/translations.js` | the word-translation registry: `TRANSLATIONS`, `registerTranslations()`, `transEntry()`, `vTransOf()`, `tKeysOf()` |
 | `data/verbs.js` | `const VERBS` — the data, nothing else |
 | `data/prepverbs.js` | `const PREPVERBS` — the data, nothing else |
-| `data/translations_verbs_{ru,en,it}.js` | one `registerTranslations("verbs", …)` call each |
-| `data/translations_prep_{ru,en,it}.js` | one `registerTranslations("prep", …)` call each |
+| `data/translations_verbs_{ru,en,it,tr}.js` | one `registerTranslations("verbs", …)` call each |
+| `data/translations_prep_{ru,en,it,tr}.js` | one `registerTranslations("prep", …)` call each |
 | `js/course.js` | `COURSES`, `course`, `ITEMS()`, `isPrep()`, `maskExample()`, `setCourse()` |
 | `js/state.js` | `MAXID`/`BYID`, progress load/save, range, presets, folder counts |
 | `js/check.js` | answer normalisation, `checkTrans()`, `checkPerf()`, `checkPrep()`, `checkSecond()`, `secondOf()` |
@@ -109,9 +110,10 @@ In choice mode `renderQuestion()` hides `#inPerf` and the Kasus chips and fills 
 
 #### Translation files
 
-`data/translations_<course>_<lang>.js` is one `registerTranslations(courseId, code, map)` call, where `map` is `id → {trans, tKeys}`, one id per line — six files today (`verbs`/`prep` × `ru`/`en`/`it`). `js/translations.js` stores them in `TRANSLATIONS["<course>|<lang>"]`; `vTransOf(v)` and `tKeysOf(v)` resolve an entry against the active course and language, falling back to `DEFAULT_LANG` per id, so a half-finished language still renders. Nothing outside `js/translations.js` reads a translation field directly.
+`data/translations_<course>_<lang>.js` is one `registerTranslations(courseId, code, map)` call, where `map` is `id → {trans, tKeys}`, one id per line — eight files today (`verbs`/`prep` × `ru`/`en`/`it`/`tr`). `js/translations.js` stores them in `TRANSLATIONS["<course>|<lang>"]`; `vTransOf(v)` and `tKeysOf(v)` resolve an entry against the active course and language, falling back to `DEFAULT_LANG` per id, so a half-finished language still renders. Nothing outside `js/translations.js` reads a translation field directly.
 
-- `tKeys` are lowercase stems used by `checkTrans()` for fuzzy answer matching (exact match, `answer.includes(stem)` for stems ≥3 chars, or stem contains an answer word ≥4 chars). When adding or editing a translation, update its stems too, in every language file.
+- `tKeys` are lowercase stems used by `checkTrans()` for fuzzy answer matching (exact match, `answer.includes(stem)` for stems ≥3 chars, or stem contains an answer word ≥4 chars). When adding or editing a translation, update its stems too, in every language file. For agglutinative Turkish this is what makes inflected answers work: `yazdım` is accepted because `yaz` is among the stems.
+- `normRu()` in `js/check.js` folds diacritics on **both** sides before comparing, Turkish included (`ı`→`i`, `ş`→`s`, `ğ`→`g`, `ö`→`o`, `ü`→`u`, `ç`→`c`, plus the stray U+0307 that `toLowerCase()` leaves behind for `İ`), so `kirmak` is accepted for `kırmak` and stems can be written with proper Turkish spelling.
 - Adding an entry to a data array means adding the same `id` to every `data/translations_<course>_*.js`.
 - Prep translations came from the English column of `Verben_mit_Praepositionen_EN.pdf` — the source PDF, no longer tracked in the repo; the Russian and Italian ones were written for this app.
 
@@ -121,7 +123,7 @@ One language = three files: `js/labels_<code>.js` for the UI strings (a single `
 
 `t(key)` looks up the current language and falls back to `DEFAULT_LANG` (`ru`) for a missing key, so a partially translated new language still renders. Static markup is translated via `data-i18n` / `data-i18n-placeholder` attributes resolved by `applyStaticI18n()`. Dynamic screens re-render on language switch inside `setLang()` — add new screens there if they show translated text.
 
-**Adding a language** (say Turkish): copy `js/labels_en.js` → `js/labels_tr.js` and translate the values; copy `data/translations_verbs_en.js` and `data/translations_prep_en.js` → `..._tr.js`, change the `"en"` argument to `"tr"` and translate the `trans`/`tKeys` values; add three `<script src>` tags — the labels file after `js/i18n.js`, the two data files after `data/prepverbs.js`. The German data files are not touched at all. Nothing else — the header buttons are built by `renderLangToggle()` from `LANG_ORDER` (registration order = button order), and `js/main.js` wires the toggle by delegation because those buttons do not exist until `initLang()` runs. `initLang()` runs first in the init line: it resolves the saved language before `loadProgress()` writes its first translated status line.
+**Adding a language** (say Polish): copy `js/labels_en.js` → `js/labels_pl.js` and translate the values; copy `data/translations_verbs_en.js` and `data/translations_prep_en.js` → `..._pl.js`, change the `"en"` argument to `"pl"` and translate the `trans`/`tKeys` values; add three `<script src>` tags — the labels file after `js/i18n.js`, the two data files after `data/prepverbs.js`. The German data files are not touched at all. Turkish (`tr`) was added exactly this way and is the worked example to copy from. Nothing else — the header buttons are built by `renderLangToggle()` from `LANG_ORDER` (registration order = button order), and `js/main.js` wires the toggle by delegation because those buttons do not exist until `initLang()` runs. `initLang()` runs first in the init line: it resolves the saved language before `loadProgress()` writes its first translated status line.
 
 Adding a *string* still means adding it to every `labels_*.js` — the fallback keeps the app working, but it shows Russian.
 

@@ -3,8 +3,12 @@
 /* ---------- ПРОВЕРКА ---------- */
 function foldDe(s){ return s.replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss'); }
 function normPerf(s){ return foldDe((s||"").toLowerCase()).replace(/[.,;!]/g," ").replace(/\s+/g," ").trim(); }
-function normRu(s){ return (s||"").toLowerCase().replace(/ё/g,"е")
-  .replace(/[àáâã]/g,"a").replace(/[èéêë]/g,"e").replace(/[ìíîï]/g,"i").replace(/[òóôõ]/g,"o").replace(/[ùúûü]/g,"u").replace(/ç/g,"c")
+/* Диакритика сворачивается с обеих сторон (и у ответа, и у основы), поэтому турецкое
+   «kırmak» принимается и в виде «kirmak»: ı→i, ş→s, ğ→g, ö→o, ü→u, ç→c.
+   U+0307 — точка от «İ», которую toLowerCase() оставляет отдельным символом. */
+function normRu(s){ return (s||"").toLowerCase().replace(/ё/g,"е").replace(/\u0307/g,"")
+  .replace(/[àáâã]/g,"a").replace(/[èéêë]/g,"e").replace(/[ìíîïı]/g,"i").replace(/[òóôõö]/g,"o").replace(/[ùúûü]/g,"u")
+  .replace(/ç/g,"c").replace(/ş/g,"s").replace(/ğ/g,"g")
   .replace(/[.,;!?()'’]/g," ").replace(/\s+/g," ").trim(); }
 /* Перевод и его основы берутся из реестра переводов — см. js/translations.js. */
 function checkPerf(v,ans){ const a=normPerf(ans); if(!a)return false; for(const p of v.perf){ if(a===normPerf(p))return true; } return false; }
