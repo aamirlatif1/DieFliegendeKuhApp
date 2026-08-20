@@ -28,6 +28,7 @@
   <div class="courses" id="courseToggle">
     <button data-course="verbs" class="sel" data-i18n="courseVerbs">🔤 Формы глаголов</button>
     <button data-course="prep" data-i18n="coursePrep">🔗 Глаголы с предлогами</button>
+    <button data-course="wort" data-i18n="courseWort">📚 Lernwortschatz B2</button>
   </div>
 
   <div class="nav" id="nav">
@@ -134,6 +135,11 @@
           <button type="button" class="chip" data-k="A" data-i18n="kasusA">Akkusativ (A)</button>
           <button type="button" class="chip" data-k="D" data-i18n="kasusD">Dativ (D)</button>
         </div>
+        <div class="kasuspick hide" id="artPick">
+          <button type="button" class="chip" data-a="der">der</button>
+          <button type="button" class="chip" data-a="die">die</button>
+          <button type="button" class="chip" data-a="das">das</button>
+        </div>
         <div class="choices hide" id="choiceList"></div>
         <div class="correct hide" id="corrPerf"></div>
       </div>
@@ -234,6 +240,7 @@
 <script src="js/translations.js"></script>
 <script src="data/verbs.js"></script>
 <script src="data/prepverbs.js"></script>
+<script src="data/wortschatz.js"></script>
 <script src="data/translations_verbs_ru.js"></script>
 <script src="data/translations_verbs_en.js"></script>
 <script src="data/translations_verbs_it.js"></script>
@@ -242,6 +249,10 @@
 <script src="data/translations_prep_en.js"></script>
 <script src="data/translations_prep_it.js"></script>
 <script src="data/translations_prep_tr.js"></script>
+<script src="data/translations_wort_ru.js"></script>
+<script src="data/translations_wort_en.js"></script>
+<script src="data/translations_wort_it.js"></script>
+<script src="data/translations_wort_tr.js"></script>
 <script src="js/course.js"></script>
 <script src="js/state.js"></script>
 <script src="js/check.js"></script>

@@ -17,6 +17,31 @@ function prepDistractors(v, n){
   return shuffled(pool).slice(0, n);
 }
 
+/* ---------- АРТИКЛЬ + МНОЖЕСТВЕННОЕ ЧИСЛО ---------- */
+/* Ложные варианты собираются из пар «артикль + окончание», встречающихся в курсе.
+   Первый — тот же артикль с чужим окончанием, второй — чужой артикль с тем же
+   окончанием: угадать нельзя ни по артиклю, ни по окончанию отдельно. */
+function wortPairs(){
+  const seen={}, out=[];
+  ITEMS().forEach(x=>{ if(!x.art) return; const k=x.art+"|"+x.pl; if(seen[k]) return; seen[k]=1; out.push({art:x.art, pl:x.pl}); });
+  return out;
+}
+/* Запас на случай, если в курсе не наберётся четырёх разных пар. */
+const PL_ENDINGS = ["-n","-en","-e","-er","-s","¨e","¨er","¨","–"];
+function wortFallbackPairs(){
+  const out=[]; ARTICLES.forEach(a=>PL_ENDINGS.forEach(p=>out.push({art:a, pl:p}))); return out;
+}
+function wortDistractors(v, n){
+  const right = wortAnswerOf(v), pairs = wortPairs();
+  const out=[], taken={}; taken[right]=1;   /* правильный ответ добавляется отдельно — здесь он исключён */
+  const add=a=>{ if(a && !taken[a]){ taken[a]=1; out.push(a); } };
+  const pick=(f)=>{ const c = shuffled(pairs).filter(f).map(wortAnswerOf); add(c[0]); };
+  pick(p=>p.art===v.art && p.pl!==v.pl);    /* тот же артикль, чужое окончание */
+  pick(p=>p.art!==v.art && p.pl===v.pl);    /* чужой артикль, то же окончание */
+  shuffled(pairs).concat(shuffled(wortFallbackPairs())).forEach(p=>{ if(out.length>=n) return; add(wortAnswerOf(p)); });
+  return out.slice(0,n);
+}
+
 /* ---------- PERFEKT ---------- */
 function splitPerf(s){ const p = (s||"").trim().split(/\s+/); return {aux:p[0]||"", part:p.slice(1).join(" ")}; }
 function otherAux(a){ return a==="ist" ? "hat" : "ist"; }
@@ -72,8 +97,9 @@ function perfFallback(v, have, n){
 /* ---------- СБОРКА ---------- */
 /* → {correct, options} — options уже перемешаны, correct входит в них. */
 function buildChoices(v){
-  const correct = isPrep() ? prepAnswerOf(v) : v.perf[0];
   const need = CHOICE_COUNT-1;
+  if(isWort()) return {correct:wortAnswerOf(v), options:shuffled([wortAnswerOf(v)].concat(wortDistractors(v, need)))};
+  const correct = isPrep() ? prepAnswerOf(v) : v.perf[0];
   let wrong = isPrep() ? prepDistractors(v, need) : perfDistractors(v, need);
   if(!isPrep() && wrong.length<need) wrong = wrong.concat(perfFallback(v, wrong, need-wrong.length));
   return {correct:correct, options:shuffled([correct].concat(wrong))};

@@ -73,4 +73,23 @@ registerLang("it", { name:"ITA" }, {
   learnSetupFoot:"L'intervallo e il filtro vengono memorizzati finché questa pagina resta aperta.",
   learnTapHint:"Tocca la carta per vedere di più · scorri per la carta successiva",
   learnTapHint_prep:"Tocca — preposizione e significato · ancora — esempio · scorri per la carta successiva",
+
+  /* ---------- CORSO «LERNWORTSCHATZ» ---------- */
+  courseWort:"📚 Lernwortschatz B2",
+  pageTitle_wort:"DieFliegendeKuh · Lernwortschatz Linie 1 Beruf B2 · Trainer, dizionario e flashcard",
+  subtitle_wort:"Lernwortschatz B2 Beruf",
+  rangeTitle_wort:"📍 Intervallo di parole",
+  chkPerfLbl_wort:"Chiedere l'articolo",
+  ansModeSub_wort:"per il campo «articolo + plurale»",
+  perfFieldLbl_wort:"Articolo + plurale",
+  perfFieldPh_wort:"es. -n (umlaut: ¨e oppure \"e)",
+  hidePerfLbl_wort:"Nascondi l'articolo",
+  dictTitle_wort:"📖 Lernwortschatz B2", dictSearchPh_wort:"Cerca: parola, traduzione o numero…",
+  dheadVerb_wort:"Parola · esempio", dheadPerfekt_wort:"Articolo + plurale",
+  alertChooseOne_wort:"Scegli almeno uno: traduzione o articolo.",
+  thPerf_wort:"Articolo + plurale",
+  dictAllForms_wort:"tutte le parole da ripassare",
+  learnTapHint_wort:"Tocca — articolo e significato · ancora — esempio · scorri per la carta successiva",
+  verbWord_wort:(n)=> n===1 ? "parola" : "parole",
+  confirmReset_wort:(n)=>`Reimpostare il progresso di questo corso (tutte le ${n} parole diventeranno «nuove»)?`,
 });

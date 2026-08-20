@@ -51,10 +51,20 @@ function clampLearnRange(){
   const from=parseInt(f.value,10), to=parseInt(tt.value,10);
   if(!Number.isInteger(from)||!Number.isInteger(to)||from<1||to>MAXID||from>to){ f.value=1; tt.value=Math.min(C().chunk, MAXID); }
 }
-function presetRanges(){ const step=C().chunk, out=[]; for(let a=1;a<=MAXID;a+=step) out.push([a, Math.min(a+step-1, MAXID)]); return out; }
+/* → [[from, to, подпись?]]. Если у курса задан groupBy, диапазоны идут по главам книги,
+   иначе нарезаются равными кусками по chunk. */
+function presetRanges(){
+  const g=C().groupBy;
+  if(g){ const out=[]; let cur=null;
+    ITEMS().forEach(v=>{ const k=v[g];
+      if(!cur || cur.k!==k){ cur={k:k,a:v.id,b:v.id}; out.push(cur); } else cur.b=v.id; });
+    const lbl=C().groupLabel;
+    return out.map(x=>[x.a, x.b, lbl?lbl(x.k):null]); }
+  const step=C().chunk, out=[]; for(let a=1;a<=MAXID;a+=step) out.push([a, Math.min(a+step-1, MAXID)]); return out;
+}
 function renderPresets(){
   const box=document.getElementById("presets"); box.innerHTML="";
-  presetRanges().forEach(([a,b])=>{ const btn=document.createElement("button"); btn.textContent=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
+  presetRanges().forEach(([a,b,lbl])=>{ const btn=document.createElement("button"); btn.textContent=lbl||(a+"–"+b); btn.title=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
     btn.addEventListener("click",()=>{ document.getElementById("rFrom").value=a; document.getElementById("rTo").value=b; onRangeChange(); }); box.appendChild(btn); });
   const all=document.createElement("button"); all.textContent=tc("presetAll")(MAXID); all.dataset.a=1; all.dataset.b=MAXID;
   all.addEventListener("click",()=>{ document.getElementById("rFrom").value=1; document.getElementById("rTo").value=MAXID; onRangeChange(); }); box.appendChild(all);
@@ -63,7 +73,7 @@ function markActivePreset(){ const {from,to}=getRange(); document.querySelectorA
 function onRangeChange(){
   const warn=document.getElementById("rWarn"), startBtn=document.getElementById("startBtn");
   if(!rangeValid()){ warn.classList.remove("hide"); warn.textContent=t("rangeWarn")(MAXID); startBtn.disabled=true; document.getElementById("rangeCount").textContent=""; }
-  else{ warn.classList.add("hide"); startBtn.disabled=false; saveRange(); const n=rangeVerbs().length; document.getElementById("rangeCount").textContent="· "+n+" "+t("verbWord")(n); }
+  else{ warn.classList.add("hide"); startBtn.disabled=false; saveRange(); const n=rangeVerbs().length; document.getElementById("rangeCount").textContent="· "+n+" "+tc("verbWord")(n); }
   markActivePreset(); refreshFolders(); renderModes();
   if(dictFilter==="range") renderDict();
 }

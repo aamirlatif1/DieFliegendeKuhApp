@@ -32,12 +32,17 @@ function startQuiz(mode){
   if(!rangeValid()){ alert(t("alertNoRange")); show("home"); return; }
   const askT=document.getElementById("chkTrans").checked, askP=document.getElementById("chkPerf").checked;
   if(!askT&&!askP){ alert(tc("alertChooseOne")); return; }
-  const queue=buildQueue(mode);
+  let queue=buildQueue(mode);
+  /* Если спрашивается только второе поле, слова без второго ответа (глаголы, обороты) выпадают. */
+  if(!askT) queue=queue.filter(hasSecond);
   if(queue.length===0){ alert(t("alertEmptyPool")); return; }
   session={queue,idx:0,results:[],askT,askP,ansMode:selectedAnsMode(),choices:null,pick:null}; show("quiz"); renderQuestion();
 }
+function curItem(){ return session ? session.queue[session.idx] : null; }
+/* Второй вопрос задаётся, только если у слова вообще есть второй ответ. */
+function askSecond(){ const v=curItem(); return !!session && session.askP && !!v && hasSecond(v); }
 /* Варианты показываются только вместо второго поля — перевод всегда вводится текстом. */
-function choiceOn(){ return !!session && session.ansMode==="choice" && session.askP; }
+function choiceOn(){ return !!session && session.ansMode==="choice" && askSecond(); }
 function renderChoices(v){
   const box=document.getElementById("choiceList"); box.innerHTML="";
   session.choices=buildChoices(v); session.pick=null;
@@ -67,45 +72,53 @@ function renderQuestion(){
   document.getElementById("qscore").textContent=`✓ ${session.results.filter(r=>r.ok).length}`;
   document.getElementById("qverb").innerHTML=`${v.inf}`+(v.hint?` <span class="hint">(${v.hint})</span>`:"");
   const qex=document.getElementById("qexample");
-  qex.textContent = isPrep()? maskExample(v) : "";
-  qex.classList.toggle("hide", !isPrep());
+  const withEx = isPrep() || isWort();
+  qex.textContent = isPrep()? maskExample(v) : (isWort()? maskWord(v) : "");
+  qex.classList.toggle("hide", !withEx);
+  const askP=askSecond();
   document.getElementById("fTrans").classList.toggle("hide",!session.askT);
-  document.getElementById("fPerf").classList.toggle("hide",!session.askP);
+  document.getElementById("fPerf").classList.toggle("hide",!askP);
   const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf");
   it.value="";ip.value="";it.className="";ip.className="";it.disabled=false;ip.disabled=false;
-  clearKasus();
+  clearKasus(); clearArt();
   const ch=choiceOn(), cl=document.getElementById("choiceList");
   ip.classList.toggle("hide",ch);
   document.getElementById("kasusPick").classList.toggle("hide",!isPrep()||ch);
+  document.getElementById("artPick").classList.toggle("hide",!isWort()||ch);
   cl.classList.toggle("hide",!ch);
   if(ch) renderChoices(v); else { cl.innerHTML=""; session.choices=null; session.pick=null; }
   document.getElementById("corrTrans").classList.add("hide"); document.getElementById("corrPerf").classList.add("hide"); document.getElementById("ovTrans").classList.add("hide");
   document.getElementById("checkBtn").classList.remove("hide"); document.getElementById("nextBtn").classList.add("hide");
-  setTimeout(()=>{ if(session.askT) it.focus(); else if(!ch) ip.focus(); },50);
+  setTimeout(()=>{ if(session.askT) it.focus(); else if(!ch && askP) ip.focus(); },50);
 }
 function doCheck(){
   if(choiceOn() && session.pick===null){ alert(t("alertPickOption")); return; }
-  const v=session.queue[session.idx]; const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf"); let okT=true, okP=true;
+  const v=session.queue[session.idx]; const askP=askSecond();
+  const it=document.getElementById("inTrans"), ip=document.getElementById("inPerf"); let okT=true, okP=true;
   const vTrans = vTransOf(v); let ansP = ip.value;
   if(session.askT){ okT=checkTrans(v,it.value); it.disabled=true; it.classList.add(okT?"good":"bad");
     const ct=document.getElementById("corrTrans"); ct.classList.remove("hide");
     ct.innerHTML=okT?`<span class="ok">${t("correctYes")}</span> ${t("valueLbl")} <span class="sol">${vTrans}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${vTrans}</span>`;
     document.getElementById("ovTrans").classList.remove("hide"); styleOverride(okT); }
-  if(session.askP){
+  if(askP){
     if(choiceOn()){ ansP=session.pick; okP=(ansP===session.choices.correct); markChoices(); }
-    else { okP=checkSecond(v,ip.value,selectedKasus()); ip.disabled=true; ip.classList.add(okP?"good":"bad"); }
+    else { okP=checkSecond(v,ip.value,isWort()?selectedArt():selectedKasus()); ip.disabled=true; ip.classList.add(okP?"good":"bad");
+      /* в курсе словаря артикль может быть выбран кнопкой — склеиваем, чтобы в разборе ошибок был весь ответ */
+      if(isWort()) ansP=[selectedArt(), ip.value.trim()].filter(Boolean).join(" "); }
     const sol=secondOf(v);
     const cp=document.getElementById("corrPerf"); cp.classList.remove("hide");
     cp.innerHTML=okP?`<span class="ok">${t("correctYes")}</span> <span class="sol">${sol}</span>`:`<span class="bad">${t("correctNo")}</span> ${t("correctLbl")} <span class="sol">${sol}</span>`; }
-  curEval={okT,okP,v,ansT:it.value,ansP};
+  curEval={okT,okP,v,askP,ansT:it.value,ansP};
   document.getElementById("checkBtn").classList.add("hide"); document.getElementById("nextBtn").classList.remove("hide"); document.getElementById("nextBtn").focus();
 }
 function selectedKasus(){ const b=document.querySelector("#kasusPick button.sel"); return b?b.dataset.k:""; }
 function clearKasus(){ document.querySelectorAll("#kasusPick button").forEach(b=>b.classList.remove("sel")); }
+function selectedArt(){ const b=document.querySelector("#artPick button.sel"); return b?b.dataset.a:""; }
+function clearArt(){ document.querySelectorAll("#artPick button").forEach(b=>b.classList.remove("sel")); }
 function styleOverride(okT){ const b=document.querySelectorAll('#ovTrans .chip'); b.forEach(x=>x.classList.remove("on-ok","on-bad")); if(okT)b[0].classList.add("on-ok"); else b[1].classList.add("on-bad"); }
 function nextQuestion(){
-  const e=curEval; const ok=(session.askT?e.okT:true)&&(session.askP?e.okP:true);
-  session.results.push({id:e.v.id,v:e.v,okT:e.okT,okP:e.okP,ok,ansT:e.ansT,ansP:e.ansP,askT:session.askT,askP:session.askP});
+  const e=curEval; const ok=(session.askT?e.okT:true)&&(e.askP?e.okP:true);
+  session.results.push({id:e.v.id,v:e.v,okT:e.okT,okP:e.okP,ok,ansT:e.ansT,ansP:e.ansP,askT:session.askT,askP:e.askP});
   status[e.v.id]=ok?"learned":"notlearned"; saveProgress(); refreshFolders();
   session.idx++; if(session.idx>=session.queue.length) showResults(); else renderQuestion();
 }
@@ -122,7 +135,7 @@ function showResults(){
     wrong.forEach(r=>{ const v=r.v; const vTrans=vTransOf(v);
       let tCell = !r.askT?"—":(r.okT?`<span class="badge s">${t("badgeCorrect")}</span>`:`<div class="you">✗ ${escapeHtml(r.ansT)||"—"}</div><div class="sol">✓ ${vTrans}</div>`);
       let pCell = !r.askP?"—":(r.okP?`<span class="badge s">${t("badgeCorrect")}</span>`:`<div class="you">✗ ${escapeHtml(r.ansP)||"—"}</div><div class="sol">✓ ${secondOf(v)}</div>`);
-      const sub = isPrep()? `№${v.id}` : `№${v.id} · ${v.aux}`;
+      const sub = isWort()? `№${v.id} · K${v.kap}` : (isPrep()? `№${v.id}` : `№${v.id} · ${v.aux}`);
       rows+=`<tr><td><b>${v.inf}</b>${v.hint?` <span class="muted">(${v.hint})</span>`:""}<div class="muted" style="font-size:11px">${sub}</div></td><td>${tCell}</td><td>${pCell}</td></tr>`; });
     errBody.innerHTML=`<table><thead><tr><th>${t("thVerb")}</th><th>${t("thTrans")}</th><th>${tc("thPerf")}</th></tr></thead><tbody>${rows}</tbody></table>`; }
   session._wrongIds=wrong.map(r=>r.id); show("result");

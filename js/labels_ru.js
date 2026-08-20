@@ -73,4 +73,23 @@ registerLang("ru", { name:"RUS" }, {
   learnSetupFoot:"Диапазон и фильтр запоминаются, пока открыта эта страница.",
   learnTapHint:"Тап по карточке — рассмотреть · свайп — следующая карточка",
   learnTapHint_prep:"Тап — предлог и перевод · ещё тап — пример · свайп — следующая карточка",
+
+  /* ---------- КУРС «LERNWORTSCHATZ» ---------- */
+  courseWort:"📚 Lernwortschatz B2",
+  pageTitle_wort:"DieFliegendeKuh · Lernwortschatz Linie 1 Beruf B2 · Тренажёр, словарь и карточки",
+  subtitle_wort:"Lernwortschatz B2 Beruf",
+  rangeTitle_wort:"📍 Диапазон слов",
+  chkPerfLbl_wort:"Спрашивать артикль",
+  ansModeSub_wort:"артикль + мн. число — ввод или выбор",
+  perfFieldLbl_wort:"Артикль + множественное число",
+  perfFieldPh_wort:"напр. -n (умлаут: ¨e или \"e)",
+  hidePerfLbl_wort:"Скрыть артикль",
+  dictTitle_wort:"📖 Lernwortschatz B2", dictSearchPh_wort:"Поиск: слово, перевод или номер…",
+  dheadVerb_wort:"Слово · пример", dheadPerfekt_wort:"Артикль + мн. ч.",
+  alertChooseOne_wort:"Выбери хотя бы одно: перевод или артикль.",
+  thPerf_wort:"Артикль + мн. ч.",
+  dictAllForms_wort:"все слова для повторения",
+  learnTapHint_wort:"Тап — артикль и перевод · ещё тап — пример · свайп — следующая карточка",
+  verbWord_wort:(n)=>{ const f=["слово","слова","слов"]; const a=n%10,b=n%100; if(a===1&&b!==11)return f[0]; if(a>=2&&a<=4&&(b<10||b>=20))return f[1]; return f[2]; },
+  confirmReset_wort:(n)=>`Сбросить прогресс этого курса (все ${n} слов станут «новыми»)?`,
 });

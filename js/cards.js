@@ -12,7 +12,7 @@ function learnStatusesChecked(){
 function buildLearnQueue(){ const st=learnStatusesChecked(); return ITEMS().filter(learnInRange).filter(v=>st[status[v.id]]); }
 function renderLearnPresets(){
   const box=document.getElementById("presetsL"); box.innerHTML="";
-  presetRanges().forEach(([a,b])=>{ const btn=document.createElement("button"); btn.textContent=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
+  presetRanges().forEach(([a,b,lbl])=>{ const btn=document.createElement("button"); btn.textContent=lbl||(a+"–"+b); btn.title=a+"–"+b; btn.dataset.a=a; btn.dataset.b=b;
     btn.addEventListener("click",()=>{ document.getElementById("rFromL").value=a; document.getElementById("rToL").value=b; onLearnRangeChange(); }); box.appendChild(btn); });
   const all=document.createElement("button"); all.textContent=tc("presetAll")(MAXID); all.dataset.a=1; all.dataset.b=MAXID;
   all.addEventListener("click",()=>{ document.getElementById("rFromL").value=1; document.getElementById("rToL").value=MAXID; onLearnRangeChange(); }); box.appendChild(all);
@@ -21,7 +21,7 @@ function markActivePresetL(){ const {from,to}=learnRange(); document.querySelect
 function onLearnRangeChange(){
   const warn=document.getElementById("rWarnL"), startBtn=document.getElementById("learnStartBtn");
   if(!learnRangeValid()){ warn.classList.remove("hide"); warn.textContent=t("rangeWarn")(MAXID); startBtn.disabled=true; document.getElementById("rangeCountL").textContent=""; }
-  else{ warn.classList.add("hide"); startBtn.disabled=false; const n=ITEMS().filter(learnInRange).length; document.getElementById("rangeCountL").textContent="· "+n+" "+t("verbWord")(n); }
+  else{ warn.classList.add("hide"); startBtn.disabled=false; const n=ITEMS().filter(learnInRange).length; document.getElementById("rangeCountL").textContent="· "+n+" "+tc("verbWord")(n); }
   markActivePresetL();
 }
 let learnDeck=null, cardState=0, learnDrag=null;
@@ -47,7 +47,11 @@ function renderLearnCard(){
   document.getElementById("learnCardBadge").textContent=STATUS_EMOJI[status[v.id]]||"📘";
   document.getElementById("learnCardInf").innerHTML=v.inf+(v.hint?` <span class="hint">(${v.hint})</span>`:"");
   const forms=document.getElementById("learnCardForms"), trans=document.getElementById("learnCardTrans");
-  if(isPrep()){
+  if(isWort()){
+    forms.innerHTML=`<div>${maskWord(v)}</div>`;
+    const art=wortAnswerOf(v);
+    trans.innerHTML=(art?`<div class="artline ${v.art}">${art}</div>`:"")+`<div>${vTransOf(v)}</div>`;
+  } else if(isPrep()){
     forms.innerHTML=`<div>${maskExample(v)}</div>`;
     trans.innerHTML=`<div class="prepline">${prepAnswerOf(v)}</div><div>${vTransOf(v)}</div>`;
   } else {

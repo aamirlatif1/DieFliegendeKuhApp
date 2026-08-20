@@ -13,7 +13,7 @@ h1 small{display:block; font-weight:500; color:var(--muted); font-size:12.5px; m
 .courses{display:flex; gap:8px; margin-bottom:10px}
 .courses button{flex:1; font-size:13.5px; font-weight:700; padding:10px; border-radius:12px}
 .courses button.sel{background:var(--accent2); color:#fff; border-color:transparent}
-@media (max-width:420px){ .courses{flex-direction:column} }
+@media (max-width:560px){ .courses{flex-direction:column} }
 .nav{display:flex; gap:8px; margin-bottom:16px}
 .nav button{flex:1; font:inherit; font-weight:700; cursor:pointer; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--txt); transition:.15s}
 .nav button.sel{background:var(--accent); color:#1a1400; border-color:transparent}

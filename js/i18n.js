@@ -37,10 +37,11 @@ function renderLangToggle(){
 /* Недостающий ключ берётся из языка по умолчанию — новый перевод можно вести постепенно. */
 function rawStr(l, key){ const L = LANGS[l]; return L ? L.strings[key] : undefined; }
 function t(key){ const v = rawStr(lang, key); return v!==undefined ? v : rawStr(DEFAULT_LANG, key); }
-/* Строка с учётом курса: в курсе предлогов сначала ищется вариант «ключ_prep». */
+/* Строка с учётом курса: вне курса форм сначала ищется вариант «ключ_<курс>»
+   («ключ_prep», «ключ_wort»); курс форм — базовый, у него суффикса нет. */
 function tc(key){
-  const alt = key+"_prep";
-  if(isPrep()){
+  const alt = key+"_"+course;
+  if(course!=="verbs"){
     const v = rawStr(lang, alt); if(v!==undefined) return v;
     /* в текущем языке нет ни варианта, ни базового ключа — берём вариант из языка по умолчанию */
     if(rawStr(lang, key)===undefined){ const f = rawStr(DEFAULT_LANG, alt); if(f!==undefined) return f; }

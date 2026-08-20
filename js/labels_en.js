@@ -73,4 +73,23 @@ registerLang("en", { name:"ENG" }, {
   learnSetupFoot:"The range and filter are remembered while this page stays open.",
   learnTapHint:"Tap the card to reveal more · swipe for the next card",
   learnTapHint_prep:"Tap — preposition and meaning · tap again — example · swipe for the next card",
+
+  /* ---------- LERNWORTSCHATZ COURSE ---------- */
+  courseWort:"📚 Lernwortschatz B2",
+  pageTitle_wort:"DieFliegendeKuh · Lernwortschatz Linie 1 Beruf B2 · Trainer, Dictionary & Flashcards",
+  subtitle_wort:"Lernwortschatz B2 Beruf",
+  rangeTitle_wort:"📍 Word range",
+  chkPerfLbl_wort:"Ask article",
+  ansModeSub_wort:"for the “article + plural” field",
+  perfFieldLbl_wort:"Article + plural",
+  perfFieldPh_wort:"e.g. -n (umlaut: ¨e or \"e)",
+  hidePerfLbl_wort:"Hide article",
+  dictTitle_wort:"📖 Lernwortschatz B2", dictSearchPh_wort:"Search: word, translation or number…",
+  dheadVerb_wort:"Word · example", dheadPerfekt_wort:"Article + plural",
+  alertChooseOne_wort:"Choose at least one: translation or article.",
+  thPerf_wort:"Article + plural",
+  dictAllForms_wort:"all words for review",
+  learnTapHint_wort:"Tap — article and meaning · tap again — example · swipe for the next card",
+  verbWord_wort:(n)=> n===1 ? "word" : "words",
+  confirmReset_wort:(n)=>`Reset this course's progress (all ${n} words will become “new”)?`,
 });

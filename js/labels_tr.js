@@ -73,4 +73,23 @@ registerLang("tr", { name:"TÜR" }, {
   learnSetupFoot:"Aralık ve filtre, bu sayfa açık kaldığı sürece hatırlanır.",
   learnTapHint:"Devamı için karta dokun · sonraki kart için kaydır",
   learnTapHint_prep:"Dokun — edat ve anlam · tekrar dokun — örnek · sonraki kart için kaydır",
+
+  /* ---------- «LERNWORTSCHATZ» KURSU ---------- */
+  courseWort:"📚 Lernwortschatz B2",
+  pageTitle_wort:"DieFliegendeKuh · Lernwortschatz Linie 1 Beruf B2 · Alıştırma, sözlük ve kartlar",
+  subtitle_wort:"Lernwortschatz B2 Beruf",
+  rangeTitle_wort:"📍 Kelime aralığı",
+  chkPerfLbl_wort:"Artikel sorulsun",
+  ansModeSub_wort:"«artikel + çoğul» alanı için",
+  perfFieldLbl_wort:"Artikel + çoğul",
+  perfFieldPh_wort:"örn. -n (umlaut: ¨e veya \"e)",
+  hidePerfLbl_wort:"Artikeli gizle",
+  dictTitle_wort:"📖 Lernwortschatz B2", dictSearchPh_wort:"Ara: kelime, anlam veya numara…",
+  dheadVerb_wort:"Kelime · örnek", dheadPerfekt_wort:"Artikel + çoğul",
+  alertChooseOne_wort:"En az birini seç: anlam veya artikel.",
+  thPerf_wort:"Artikel + çoğul",
+  dictAllForms_wort:"tekrar için tüm kelimeler",
+  learnTapHint_wort:"Dokun — artikel ve anlam · tekrar dokun — örnek · sonraki kart için kaydır",
+  verbWord_wort:(n)=>"kelime",
+  confirmReset_wort:(n)=>`Bu kursun ilerlemesi sıfırlansın mı (${n} kelimenin tümü «yeni» olacak)?`,
 });

@@ -13,15 +13,15 @@ function renderDict(){
   const hideT=document.getElementById("hideTrans").checked, hideP=document.getElementById("hidePerf").checked;
   const {from,to}=getRange();
   document.getElementById("dictSub").textContent = dictFilter==="range"&&rangeValid()? t("inDiap")(from,to) : tc("dictAllForms");
-  document.getElementById("dictCount").textContent = list.length+" "+t("verbWord")(list.length);
+  document.getElementById("dictCount").textContent = list.length+" "+tc("verbWord")(list.length);
   const body=document.getElementById("dictBody"), empty=document.getElementById("dictEmpty");
   if(list.length===0){ body.innerHTML=""; empty.textContent=t("dictEmpty"); return; } else empty.textContent="";
   let html="";
   list.forEach(v=>{
     const st=status[v.id];
-    const perfCls = isPrep() ? (v.kasus==="A"?"akk":"dat") : (v.perf[0].startsWith("ist")?"ist":"hat");
-    const perfTxt = secondOf(v);
-    const formsTxt = isPrep() ? v.example : (v.pras+" · "+v.prat);
+    const perfCls = isWort() ? (v.art||"nopl") : (isPrep() ? (v.kasus==="A"?"akk":"dat") : (v.perf[0].startsWith("ist")?"ist":"hat"));
+    const perfTxt = secondOf(v) || "—";
+    const formsTxt = (isPrep()||isWort()) ? v.example : (v.pras+" · "+v.prat);
     const vTrans = vTransOf(v);
     html+=`<div class="drow" data-id="${v.id}">
       <div><div class="dinf"><span class="sdot ${st}"></span><span class="num">${v.id}.</span>${v.inf}${v.hint?` <span class="hint">(${v.hint})</span>`:""}</div>

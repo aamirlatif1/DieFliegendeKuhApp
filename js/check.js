@@ -37,6 +37,38 @@ function checkPrep(v,ans,kasusPick){
   const kasus = p.kasus || kasusPick || "";
   return p.prep === foldDe(v.prep) && kasus === v.kasus;
 }
-/* Второе поле теста: Perfekt в курсе форм, предлог + падеж в курсе предлогов. */
-function checkSecond(v,ans,kasusPick){ return isPrep()? checkPrep(v,ans,kasusPick) : checkPerf(v,ans); }
-function secondOf(v){ return isPrep()? prepAnswerOf(v) : v.perf.join(" / "); }
+/* ---------- АРТИКЛЬ + МНОЖЕСТВЕННОЕ ЧИСЛО ---------- */
+/* Умлаут в показателе множественного числа набирается как ¨, ", ^ или +:
+   «der, ¨e» принимается и в виде «der "e», «der ^e», «der +e».
+   Дефис перед окончанием необязателен, «–» (форма не меняется) = пустое окончание. */
+function normPl(s){
+  return (s||"").toLowerCase()
+    .replace(/[¨"^+]/g,"~").replace(/[–—]/g,"-")
+    .replace(/[\s,.()]/g,"").replace(/^-+/,"").replace(/^~-/,"~");
+}
+function parseWortAnswer(s){
+  const txt = (s||"").toLowerCase().replace(/[,]/g," ").replace(/\s+/g," ").trim();
+  if(!txt) return {art:"", pl:""};
+  const words = txt.split(" "); let art="";
+  const rest = words.filter(w=>{ if(!art && ARTICLES.includes(w)){ art=w; return false; } return true; });
+  return {art:art, pl:rest.join(" ")};
+}
+function checkWort(v,ans,artPick){
+  if(!v.art) return true;                       /* у слова нет артикля — спрашивать нечего */
+  const p = parseWortAnswer(ans);
+  const art = p.art || artPick || "";
+  if(art !== v.art) return false;
+  return normPl(p.pl) === normPl(v.pl);
+}
+/* Второе поле теста: Perfekt в курсе форм, предлог + падеж в курсе предлогов,
+   артикль + множественное число в курсе словаря. */
+function checkSecond(v,ans,pick){
+  if(isWort()) return checkWort(v,ans,pick);
+  return isPrep()? checkPrep(v,ans,pick) : checkPerf(v,ans);
+}
+function secondOf(v){
+  if(isWort()) return wortAnswerOf(v);
+  return isPrep()? prepAnswerOf(v) : v.perf.join(" / ");
+}
+/* Второй вопрос есть не у всех слов: у глаголов и оборотов артикля нет. */
+function hasSecond(v){ return !!secondOf(v); }

@@ -10,8 +10,8 @@ function courseDump(id){ const c=COURSES[id], st=statuses[id]; const grp=s=>c.da
 function exportProgress(){
   const now=new Date();
   const dump={}; COURSE_IDS.forEach(id=>dump[id]=courseDump(id));
-  /* version 4: прогресс обоих курсов. Поля верхнего уровня — для совместимости с v3. */
-  const data={app:"deutsch_verben_1_270",version:4,savedAt:now.toISOString(),course,
+  /* version 5: прогресс всех трёх курсов. Поля верхнего уровня — для совместимости с v3. */
+  const data={app:"deutsch_verben_1_270",version:5,savedAt:now.toISOString(),course,
     courses:dump, summary:dump.verbs.summary, folders:dump.verbs.folders, status:dump.verbs.status};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob), a=document.createElement("a");
   a.href=url; a.download="verben_progress_"+tsStamp(now)+".json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
